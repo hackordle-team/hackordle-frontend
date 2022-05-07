@@ -1,4 +1,11 @@
-# Getting Started with Create React App
+# Stack
+
+- language:  Typescript  [docs link](https://www.typescriptlang.org/docs/)
+- framework: React v18 [docs link](https://reactjs.org/docs/getting-started.html)
+- css utility: tailwind [docs link](https://tailwindcss.com/docs/installation)
+- navigation: react router [docs link](https://reactrouter.com/docs/en/v6/getting-started/tutorial)
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
