@@ -8,7 +8,7 @@ interface HackbarProps {
 
 const Hackbar: React.FC<HackbarProps> = ({hackNames, hackFunctions}) => {    
     return (
-        <div className="flex justify-center px-4 py-5 w-full">
+        <div className="flex justify-center px-4 py-4 w-full">
             {hackNames.map((item,index)=>{
                 return <HackButton key={item} hackName={item} hackFunction={hackFunctions[index]}/>
             })}
