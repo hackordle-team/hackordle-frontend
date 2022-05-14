@@ -3,14 +3,13 @@ import Board from "./Board";
 import { MockGameState } from "../const/const";
 import Keyboard from "./Keyboard";
 import Hackbar from "./Hackbar";
-import { DictionaryContext } from "../App";
+import { GameContendContext } from "../App";
 
-interface GameProps {
-  wordOfDay: string;
-}
 
-const Game: React.FC<GameProps> = ({ wordOfDay }) => {
-  const dict = useContext(DictionaryContext);
+
+const Game: React.FC = () => {
+  const content = useContext(GameContendContext);
+  console.log(content);
 
   const [innerInput, setInnerInput] = useState<string>("");
 
@@ -22,8 +21,7 @@ const Game: React.FC<GameProps> = ({ wordOfDay }) => {
     setInnerInput((prevState) => prevState + val);
   }
   console.log(innerInput);
-
-
+  
   return (
     <div className="w-full m-auto">
       <Board cols={10} rows={8} gameState={MockGameState} />
