@@ -4,10 +4,10 @@ import Keyboard from "./Keyboard";
 import Hackbar from "./Hackbar";
 import { ColorType, GameElementType, GameState } from "../const/types";
 import { GameContendContext } from "../App";
+import Question from "../components/Question";
 
 const Game: React.FC = () => {
   const content = useContext(GameContendContext);
-
   const [innerInput, setInnerInput] = useState<string>("");
   const [columns, setColumns] = useState(10);
   const [gameState, setGameState] = useState<GameState>({
@@ -15,6 +15,7 @@ const Game: React.FC = () => {
     rows: [],
   });
   const [enter, setEnter] = useState(false);
+  const [showQuestion, setShowQuestion] = useState(false);
 
   const handleBackspace = useCallback(() => {
     setInnerInput((prevState) => prevState.slice(0, -1));
@@ -65,7 +66,7 @@ const Game: React.FC = () => {
 
   const handleEnter = () => {
     setEnter(true);
-    console.log("Enter pressed");
+    //console.log("Enter pressed");
   };
 
   return (
@@ -79,10 +80,10 @@ const Game: React.FC = () => {
       <Hackbar
         hackNames={["HACK 1", "HACK 2", "HACK 3", "HACK 4"]}
         hackFunctions={[
-          () => console.log("ADD ROW"),
-          () => console.log("ADD COIL"),
-          () => console.log("ADD COIL"),
-          () => console.log("ADD COIL"),
+          () => setShowQuestion(true),
+          () => setShowQuestion(true),
+          () => setShowQuestion(true),
+          () => setShowQuestion(true),
         ]}
       />
       <Keyboard
@@ -90,6 +91,13 @@ const Game: React.FC = () => {
         handleLetter={handleLetter}
         handleEnter={handleEnter}
       />
+      {showQuestion && (
+        <Question
+          question={content.questions?.[0]}
+          hackName={"hack"}
+          onResult={() => setShowQuestion(false)}
+        />
+      )}
     </div>
   );
 };

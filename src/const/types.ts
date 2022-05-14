@@ -22,7 +22,7 @@ export type AnswerType = {
 
 export type QuestionType = {
   question: string;
-  answers: AnswerType;
+  answers: AnswerType[];
 };
 
 export type GameContentType = {
