@@ -9,16 +9,14 @@ interface BoardElementProps {
 
 const BoardElement: React.FC<BoardElementProps> = ({ color, letter }) => {
   if (color === "BLANK") {
-    return (
-      <div className="border-2 border-white bg-black w-12 h-12 rounded-full " />
-    );
+    return <div className="border-4 border-white w-12 h-12 rounded-full " />;
   }
   return (
     <div
       className={clsx(
-        "w-12 h-12 rounded-full text-center flex items-center justify-center font-semibold",
+        "w-12 h-12 rounded-full text-center flex items-center justify-center font-bold text-white text-3xl",
         color == "GRAY" && "bg-gray-500",
-        color == "GREEN" && "bg-green-500",
+        color == "GREEN" && "bg-green-600",
         color == "YELLOW" && "bg-yellow-500"
       )}
     >
