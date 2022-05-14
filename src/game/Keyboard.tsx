@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { GameState } from "../const/types";
 
 interface KeyProps {
   value: string;
@@ -23,9 +24,10 @@ interface KeyboardProps {
   handleEnter: () => void;
   handleBackspace: () => void;
   handleLetter: (val: string) => void;
+  gameState: GameState;
 
 }
-const Keyboard: React.FC<KeyboardProps> = ({ handleBackspace, handleLetter, handleEnter }) => {
+const Keyboard: React.FC<KeyboardProps> = ({ handleBackspace, handleLetter, handleEnter, gameState }) => {
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
