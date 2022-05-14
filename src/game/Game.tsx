@@ -7,9 +7,11 @@ interface GameProps {
 }
 
 const Game: React.FC<GameProps> = ({ wordOfDay }) => {
-  return <div className="w-full m-auto">Game, word of day {wordOfDay}<br />
-    <Board cols={10} rows={8} gameState={MockGameState} />
-  </div>;
+  return (
+    <div className="w-full m-auto">
+      <Board cols={10} rows={8} gameState={MockGameState} />
+    </div>
+  );
 };
 
 export default Game;
