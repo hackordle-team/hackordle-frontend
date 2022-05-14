@@ -6,6 +6,7 @@ import { ColorType, GameElementType, GameState } from "../const/types";
 import { GameContendContext } from "../App";
 import Notification from "../components/Notification";
 import {useNavigate} from "react-router-dom";
+import Question from "../components/Question";
 
 enum GameStatus {
   IN_PROGRESS,
@@ -16,7 +17,6 @@ enum GameStatus {
 const Game: React.FC = () => {
   const content = useContext(GameContendContext);
   const navigate = useNavigate()
-
   const [innerInput, setInnerInput] = useState<string>("");
   const [columns, setColumns] = useState(10);
   const [maxRows, setMaxRows] = useState(8); //maksymalna liczba prób
@@ -26,6 +26,7 @@ const Game: React.FC = () => {
   });
   const [gameStatus, setGameStatus] = useState(GameStatus.IN_PROGRESS);
   const [enter, setEnter] = useState(false);
+  const [showQuestion, setShowQuestion] = useState(false);
 
   const handleBackspace = useCallback(() => {
     setInnerInput((prevState) => prevState.slice(0, -1));
@@ -94,7 +95,7 @@ const Game: React.FC = () => {
 
   const handleEnter = () => {
     setEnter(true);
-    console.log("Enter pressed");
+    //console.log("Enter pressed");
   };
 
   const handleGameFinish = () => {
@@ -131,10 +132,10 @@ const Game: React.FC = () => {
       <Hackbar
         hackNames={["HACK 1", "HACK 2", "HACK 3", "HACK 4"]}
         hackFunctions={[
-          () => console.log("ADD ROW"),
-          () => console.log("ADD COIL"),
-          () => console.log("ADD COIL"),
-          () => console.log("ADD COIL"),
+          () => setShowQuestion(true),
+          () => setShowQuestion(true),
+          () => setShowQuestion(true),
+          () => setShowQuestion(true),
         ]}
       />
       <Keyboard
@@ -142,6 +143,13 @@ const Game: React.FC = () => {
         handleLetter={handleLetter}
         handleEnter={handleEnter}
       />
+      {showQuestion && (
+        <Question
+          question={content.questions?.[0]}
+          hackName={"hack"}
+          onResult={() => setShowQuestion(false)}
+        />
+      )}
     </div>
   );
 };
