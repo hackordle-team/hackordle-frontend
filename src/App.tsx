@@ -6,6 +6,8 @@ import MultiplayerGame from "./pages/MultiplayerGame";
 import Multiplayer from "./pages/Multiplayer";
 import Singleplayer from "./pages/Singleplayer";
 import Help from "./pages/Help";
+import Game from "./game/Game";
+
 
 const App: React.FC = () => {
   return (
