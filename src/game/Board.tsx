@@ -3,26 +3,36 @@ import { GameState } from "../const/types";
 import BoardElement from "./BoardElement";
 
 interface BoardProps {
+  cols: number;
   rows: number;
   gameState: GameState;
+  innerState: string;
 }
 
-const getGameRow = (gameState: GameState, row: number) => {
-  const letters =
-    row < gameState.rowsNumber
-      ? gameState.rows[row].elements.map((boardElement, i) => (
-          <BoardElement
-            key={i}
-            letter={boardElement.letter}
-            color={boardElement.color}
-          />
-        ))
-      : [];
+const getGameRow = (
+  cols: number,
+  gameState: GameState,
+  row: number,
+  innerState: string
+) => {
+  let letters: JSX.Element[] = [];
+  let blanksNumber: number = cols
 
-  const blanksNumber =
-    row < gameState.rowsNumber && gameState.rows[row]?.length
-      ? gameState.cellNumber - gameState.rows[row].length
-      : gameState.cellNumber;
+  if (row < gameState.rowsNumber) {
+    letters = gameState.rows[row].elements.map((boardElement, i) => (
+      <BoardElement
+        key={i}
+        letter={boardElement.letter}
+        color={boardElement.color}
+      />
+    ));
+    blanksNumber = cols - gameState.rows[row].length;
+  } else if (row == gameState.rowsNumber) {
+    letters = innerState
+      ?.split("")
+      .map((e, i) => <BoardElement key={i} letter={e} color="INNER" />);
+    blanksNumber = cols - (innerState?.length ?? 0);
+  }
 
   const blanks = [...new Array(blanksNumber)].map((blank, key) => (
     <BoardElement key={key} color="BLANK" />
@@ -30,20 +40,25 @@ const getGameRow = (gameState: GameState, row: number) => {
   return [...letters, ...blanks];
 };
 
-const getGameRows = (gameState: GameState, rows: number) => {
+const getGameRows = (
+  cols: number,
+  gameState: GameState,
+  rows: number,
+  innerState: string
+) => {
   return [...new Array(rows)].map((row, i) => (
     <div key={`key-${i}`} className="m-auto flex space-x-3">
-      {getGameRow(gameState, i).map((el, id) => (
+      {getGameRow(cols, gameState, i, innerState).map((el, id) => (
         <div key={id}>{el}</div>
       ))}
     </div>
   ));
 };
 
-const Board: React.FC<BoardProps> = ({ rows, gameState }) => {
+const Board: React.FC<BoardProps> = ({ cols, rows, gameState, innerState }) => {
   const generatedRows = useMemo(
-    () => getGameRows(gameState, rows),
-    [gameState, rows]
+    () => getGameRows(cols, gameState, rows, innerState),
+    [cols, gameState, rows, innerState]
   );
 
   return (

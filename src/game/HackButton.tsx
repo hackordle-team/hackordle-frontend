@@ -4,13 +4,12 @@ import { GameState } from "../const/types";
 
 interface HackbarProps {
     hackName: string;
-    hackFunction: (gameState: GameState) => void;
-    gameState: GameState;
+    hackFunction: () => void;
   }
 
-const HackButton: React.FC<HackbarProps> = ({hackName, hackFunction, gameState}) => {   
+const HackButton: React.FC<HackbarProps> = ({hackName, hackFunction}) => {   
     const execute = () => {
-      hackFunction(gameState)
+      hackFunction()
     } 
     return (
       <div>
