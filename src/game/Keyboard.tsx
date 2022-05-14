@@ -1,4 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { ColorType, GameState } from "../const/types";
+import { LETTER_BOTTOM, LETTER_MID, LETTER_TOP } from "../const/const";
 
 interface KeyProps {
   value: string;
@@ -11,7 +13,7 @@ const Key: React.FC<KeyProps> = ({ value, handleClick, color, hover }) => {
   return (
     <button
       className={`${color} hover:${hover} m-0.5 text-white font-bold py-2 px-4 rounded-full`}
-      onClick={() =>handleClick(value)}
+      onClick={() => handleClick(value)}
       value={value}
     >
       {value}
@@ -23,29 +25,34 @@ interface KeyboardProps {
   handleEnter: () => void;
   handleBackspace: () => void;
   handleLetter: (val: string) => void;
-
+  gameState: GameState;
 }
-const Keyboard: React.FC<KeyboardProps> = ({ handleBackspace, handleLetter, handleEnter }) => {
 
+const Keyboard: React.FC<KeyboardProps> = ({
+  handleBackspace,
+  handleLetter,
+  handleEnter,
+  gameState,
+}) => {
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
-      if(event.key === 'Enter') {
+      if (event.key === "Enter") {
         handleEnter();
-      } else if(event.key === 'Backspace') {
+      } else if (event.key === "Backspace") {
         handleBackspace();
       } else {
         handleLetter(event.key.toUpperCase());
       }
-    }
-    window.addEventListener('keydown', listener);
+    };
+    window.addEventListener("keydown", listener);
 
-    return () => window.removeEventListener('keydown', listener);
+    return () => window.removeEventListener("keydown", listener);
   }, []);
 
   const handleClick = (val: string) => {
-    if(val === 'DELETE') {
+    if (val === "DELETE") {
       handleBackspace();
-    } else if (val === 'ENTER') {
+    } else if (val === "ENTER") {
       handleEnter();
     } else {
       handleLetter(val);
@@ -53,12 +60,39 @@ const Keyboard: React.FC<KeyboardProps> = ({ handleBackspace, handleLetter, hand
   };
 
   // todo get colors for each char
+  const letter = [...LETTER_TOP, ...LETTER_MID, ...LETTER_BOTTOM];
+
+  const [colors, setColors] = useState(
+    Object.fromEntries(letter.map((key) => [key, "GRAY" as ColorType]))
+  );
+
+  useEffect(() => {
+    const innerColors = { ...colors };
+
+    gameState.rows.map((row) => {
+      row.elements.map((el) => {
+        innerColors[el.letter] = el.color;
+      });
+    });
+    setColors(innerColors);
+  }, [gameState, setColors]);
+
+  const getColor = useCallback(
+    (col: ColorType) => {
+      if (col === "GREEN") return "bg-green-500";
+      if (col === "YELLOW") return "bg-yellow-500";
+      if (col === "GRAY") return "bg-gray-500";
+      if (col === "MISSED") return "bg-black";
+    },
+    [colors]
+  );
+
   return (
     <div>
       <div className="flex justify-center mb-1">
-        {["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"].map((char) => (
+        {LETTER_TOP.map((char) => (
           <Key
-            color={"bg-green-500"}
+            color={getColor(colors[char]) ?? ""}
             hover={"bg-green-700"}
             key={char}
             handleClick={handleClick}
@@ -67,9 +101,9 @@ const Keyboard: React.FC<KeyboardProps> = ({ handleBackspace, handleLetter, hand
         ))}
       </div>
       <div className="flex justify-center mb-1">
-        {["A", "S", "D", "F", "G", "H", "J", "K", "L"].map((char) => (
+        {LETTER_MID.map((char) => (
           <Key
-            color={"bg-neutral-500"}
+            color={getColor(colors[char]) ?? ""}
             hover={"bg-neutral-700"}
             key={char}
             handleClick={handleClick}
@@ -84,9 +118,9 @@ const Keyboard: React.FC<KeyboardProps> = ({ handleBackspace, handleLetter, hand
           value="ENTER"
           handleClick={handleClick}
         />
-        {['Z', 'X', 'C', 'V', 'B', 'N', 'M'].map((char) => (
+        {LETTER_BOTTOM.map((char) => (
           <Key
-            color={"bg-yellow-500"}
+            color={getColor(colors[char]) ?? ""}
             hover={"bg-yellow-700"}
             key={char}
             handleClick={handleClick}

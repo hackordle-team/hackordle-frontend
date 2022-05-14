@@ -142,6 +142,7 @@ const Game: React.FC = () => {
         handleBackspace={handleBackspace}
         handleLetter={handleLetter}
         handleEnter={handleEnter}
+        gameState={gameState}
       />
       {showQuestion && (
         <Question
