@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Board from "./Board";
 import { MockGameState } from "../const/const";
 import Keyboard from "./Keyboard";
@@ -12,6 +12,18 @@ interface GameProps {
 const Game: React.FC<GameProps> = ({ wordOfDay }) => {
   const dict = useContext(DictionaryContext);
 
+  const [innerInput, setInnerInput] = useState<string>("");
+
+  const handleBackspace = () => {
+    setInnerInput((prevState) => prevState.slice(0,-1));
+  };
+
+  const handleLetter = (val: string) => {
+    setInnerInput((prevState) => prevState + val);
+  }
+  console.log(innerInput);
+
+
   return (
     <div className="w-full m-auto">
       <Board cols={10} rows={8} gameState={MockGameState} />
@@ -24,7 +36,7 @@ const Game: React.FC<GameProps> = ({ wordOfDay }) => {
           () => console.log("ADD COIL"),
         ]}
       />
-      <Keyboard />
+      <Keyboard handleBackspace={handleBackspace} handleLetter={handleLetter}/>
     </div>
   );
 };
