@@ -97,7 +97,7 @@ const Question: React.FC<QuestionProps> = ({question, hackName, onResult}) => {
     }
 
     const answerButtonClassNames = answerButtonStates.map((el, id) => {
-        let classNames = "rounded-3xl text-white px-4 py-2 border-box mx-6 w-10/12"
+        let classNames = "rounded-3xl text-white px-4 py-2 border-box mx-6 w-full"
         if(el.selected){
             if(el.state === AnswerButtonStatus.PULSE){
                 classNames += " animate-pulse bg-yellow-300 hover:bg-yellow-200"
