@@ -6,25 +6,30 @@ import MultiplayerGame from "./pages/MultiplayerGame";
 import Multiplayer from "./pages/Multiplayer";
 import Singleplayer from "./pages/Singleplayer";
 import Help from "./pages/Help";
+import useInitialContent from "./hooks/useInitalContent";
+import { GameContentType, QuestionType } from "./const/types";
 
-export const DictionaryContext = createContext<DictionaryType>([]);
+export const GameContendContext = createContext<GameContentType>({});
 
 type DictionaryType = string[];
 
 const App: React.FC = () => {
-  const [dictionary, setDictionary] = useState<DictionaryType>([]);
+  const [dictionary, setDictionary] = useState<DictionaryType | undefined>();
+  const [word, setWord] = useState<string | undefined>();
+  const [questions, setQuestions] = useState<QuestionType[] | undefined>();
 
   useEffect(() => {
-    fetch("https://hackordle.herokuapp.com/dictionary")
-      .then((res) => res.json())
-      .then((json) => {
-        console.log(json);
-        setDictionary(json?.dictionary || []);
-      });
+    useInitialContent({
+      onQuestionsLoad: (q) => setQuestions(q),
+      onDictionaryLoad: (d) => setDictionary(d),
+      onWordOfDayLoad: (w) => setWord(w),
+    })();
   }, []);
 
   return (
-    <DictionaryContext.Provider value={dictionary}>
+    <GameContendContext.Provider
+      value={{ dictionary, questions, wordOfDay: word }}
+    >
       <Router>
         <Navbar />
         <Routes>
@@ -36,7 +41,7 @@ const App: React.FC = () => {
           <Route path="*" element={<h1>This page doesn&apos;t exist</h1>} />
         </Routes>
       </Router>
-    </DictionaryContext.Provider>
+    </GameContendContext.Provider>
   );
 };
 
