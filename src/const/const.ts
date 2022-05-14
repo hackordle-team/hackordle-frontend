@@ -18,6 +18,7 @@ export const MockElement3: GameElementType = {
 
 export const MockGameState: GameState = {
   rowsNumber: 4,
+  cellNumber: 10,
   rows: [
     {
       length: 7,
@@ -34,6 +35,6 @@ export const MockGameState: GameState = {
     {
       length: 4,
       elements: [MockElement1, MockElement2, MockElement1, MockElement3]
-    }
+    }, 
   ]
 };

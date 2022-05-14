@@ -16,5 +16,6 @@ export type GameRow = {
 
 export type GameState = {
   rowsNumber: number;
+  cellNumber: number;
   rows: GameRow[];
 }
