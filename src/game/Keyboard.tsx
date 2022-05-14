@@ -1,16 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 interface KeyProps {
   value: string;
-  handleClick: React.MouseEventHandler<HTMLButtonElement>;
+  handleClick: (val: string) => void;
   color: string;
   hover: string;
 }
+
 const Key: React.FC<KeyProps> = ({ value, handleClick, color, hover }) => {
   return (
     <button
       className={`${color} hover:${hover} m-0.5 text-white font-bold py-2 px-4 rounded-full`}
-      onClick={handleClick}
+      onClick={() =>handleClick(value)}
       value={value}
     >
       {value}
@@ -18,9 +19,37 @@ const Key: React.FC<KeyProps> = ({ value, handleClick, color, hover }) => {
   );
 };
 
-const Keyboard: React.FC = () => {
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log(event.currentTarget.value);
+interface KeyboardProps {
+  handleEnter: () => void;
+  handleBackspace: () => void;
+  handleLetter: (val: string) => void;
+
+}
+const Keyboard: React.FC<KeyboardProps> = ({ handleBackspace, handleLetter, handleEnter }) => {
+
+  useEffect(() => {
+    const listener = (event: KeyboardEvent) => {
+      if(event.key === 'Enter') {
+        handleEnter();
+      } else if(event.key === 'Backspace') {
+        handleBackspace();
+      } else {
+        handleLetter(event.key.toUpperCase());
+      }
+    }
+    window.addEventListener('keydown', listener);
+
+    return () => window.removeEventListener('keydown', listener);
+  }, []);
+
+  const handleClick = (val: string) => {
+    if(val === 'DELETE') {
+      handleBackspace();
+    } else if (val === 'ENTER') {
+      handleEnter();
+    } else {
+      handleLetter(val);
+    }
   };
 
   // todo get colors for each char
