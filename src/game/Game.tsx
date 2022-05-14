@@ -4,16 +4,27 @@ import Keyboard from "./Keyboard";
 import Hackbar from "./Hackbar";
 import { ColorType, GameElementType, GameState } from "../const/types";
 import { GameContendContext } from "../App";
+import Notification from "../components/Notification";
+import {useNavigate} from "react-router-dom";
+
+enum GameStatus {
+  IN_PROGRESS,
+  WON,
+  LOST
+}
 
 const Game: React.FC = () => {
   const content = useContext(GameContendContext);
+  const navigate = useNavigate()
 
   const [innerInput, setInnerInput] = useState<string>("");
   const [columns, setColumns] = useState(10);
+  const [maxRows, setMaxRows] = useState(8); //maksymalna liczba prób
   const [gameState, setGameState] = useState<GameState>({
     rowsNumber: 0,
     rows: [],
   });
+  const [gameStatus, setGameStatus] = useState(GameStatus.IN_PROGRESS);
   const [enter, setEnter] = useState(false);
 
   const handleBackspace = useCallback(() => {
@@ -63,13 +74,54 @@ const Game: React.FC = () => {
     setInnerInput("");
   }, [innerInput, gameState, enter, content]);
 
+  useEffect(() => {
+    if(gameState.rowsNumber == 0)
+      return;
+
+    const lastRow = gameState.rows[gameState.rowsNumber-1]
+    const greenTailsCount = lastRow.elements.filter(el => el.color === 'GREEN').length;
+
+    if(greenTailsCount === lastRow.length && lastRow.length === content.wordOfDay?.length){
+      setGameStatus(GameStatus.WON);
+      return;
+    }
+
+    if(maxRows === gameState.rowsNumber){
+      setGameStatus(GameStatus.LOST);
+      return;
+    }
+  }, [gameState])
+
   const handleEnter = () => {
     setEnter(true);
     console.log("Enter pressed");
   };
 
+  const handleGameFinish = () => {
+    //TODO: go to main menu
+    navigate('/')
+  };
+
+  const [notificationTitle, notificationMsg] = (() => {
+    if(gameStatus == GameStatus.WON)
+      return ["Wygrałeś", "Gratulacje! Udało ci się odgadnąć słowo."];
+    else if(gameStatus == GameStatus.LOST)
+      return ["Przgrałeś", "Niestety nie udało si się odgadnąć słowa."];
+    else
+      return ["", ""];
+  })();
+
   return (
     <div className="w-full m-auto">
+        <Notification title={notificationTitle} msg={notificationMsg} open={gameStatus !== GameStatus.IN_PROGRESS} handleClose={handleGameFinish}>
+          <button
+            className={"rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"}
+            style={{margin: '1vh'}}
+            onClick={handleGameFinish}
+          >
+            MENU
+          </button>
+        </Notification>
       <Board
         cols={columns}
         rows={8}
