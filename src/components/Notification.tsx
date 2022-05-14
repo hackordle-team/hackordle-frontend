@@ -31,13 +31,11 @@ const Notification: React.FC<NotificationProps> = ({title, msg, open, handleClos
             aria-describedby="modal-notification-description"
         >
             <Box sx={boxStyle}>
-                <div>
-                    <Typography id="modal-notification-title" variant="h6" component="h2">
-                        {title}
-                    </Typography>
-                </div>
+                <Typography id="modal-notification-title" variant="h6" component="h2">
+                    <p className={"font-bold"}>{title}</p>
+                </Typography>
                 <Typography id="modal-notification-description" sx={{ mt: 2 }}>
-                    {msg}
+                    <p className={"font-bold"}>{msg}</p>
                 </Typography>
                 {children}
             </Box>
