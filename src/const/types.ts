@@ -1,4 +1,4 @@
-export type ColorType = "GRAY" | "GREEN" | "YELLOW" | "BLANK";
+export type ColorType = "GRAY" | "GREEN" | "YELLOW" | "BLANK" | "INNER";
 
 export type GameElementType = {
   letter: string;
