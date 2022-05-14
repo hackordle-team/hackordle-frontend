@@ -24,6 +24,10 @@ const Game: React.FC = () => {
     [setInnerInput, columns]
   );
 
+  const handleEnter = useCallback(() => {
+    console.log("Enter pressed");
+  }, []);
+
   console.log(innerInput);
 
   return (
@@ -43,7 +47,7 @@ const Game: React.FC = () => {
           () => console.log("ADD COIL"),
         ]}
       />
-      <Keyboard handleBackspace={handleBackspace} handleLetter={handleLetter} />
+      <Keyboard handleBackspace={handleBackspace} handleLetter={handleLetter} handleEnter={handleEnter} />
     </div>
   );
 };

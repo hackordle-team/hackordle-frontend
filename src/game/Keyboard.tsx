@@ -20,17 +20,17 @@ const Key: React.FC<KeyProps> = ({ value, handleClick, color, hover }) => {
 };
 
 interface KeyboardProps {
-  handleEnter?: () => void;
+  handleEnter: () => void;
   handleBackspace: () => void;
   handleLetter: (val: string) => void;
 
 }
-const Keyboard: React.FC<KeyboardProps> = ({ handleBackspace, handleLetter }) => {
+const Keyboard: React.FC<KeyboardProps> = ({ handleBackspace, handleLetter, handleEnter }) => {
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
       if(event.key === 'Enter') {
-        console.log("Enter Pressed");
+        handleEnter();
       } else if(event.key === 'Backspace') {
         handleBackspace();
       } else {
@@ -46,7 +46,7 @@ const Keyboard: React.FC<KeyboardProps> = ({ handleBackspace, handleLetter }) =>
     if(val === 'DELETE') {
       handleBackspace();
     } else if (val === 'ENTER') {
-      console.log("Enter pressed");
+      handleEnter();
     } else {
       handleLetter(val);
     }
