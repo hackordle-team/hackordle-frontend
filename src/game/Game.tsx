@@ -46,6 +46,7 @@ const Game: React.FC = () => {
   const [showQuestion, setShowQuestion] = useState(false);
   const defFunc = () => {console.log("init")};
   const [currentHack, setCurrentHack] = useState(() => defFunc); 
+  const columnRef = useRef(columns);
 
   const handleHackMethod = useCallback((func: () => void) => {
     setCurrentHack((prevState) => func);
@@ -77,8 +78,7 @@ const Game: React.FC = () => {
 
   const handleAddRow = useCallback(
     () => {
-      setRows((prevState) => ( prevState + 1
-      ));
+      setRows((prevState) => ( prevState + 1));
       makeToansify("Dodano nową próbę")
     },
     []
@@ -209,9 +209,10 @@ const Game: React.FC = () => {
             (correctAnswer) => {
               setShowQuestion(false)
               if (correctAnswer)
-                console.log("GOOD ONE")
                 currentHack();
-              }
+               else 
+                setGameStatus(GameStatus.LOST);
+            }
             
           }
         />
