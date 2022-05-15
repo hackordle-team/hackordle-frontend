@@ -2,7 +2,7 @@ import React from "react";
 import Wrapper from "../components/Wrapper";
 
 const Help: React.FC = () => {
-  return <div className="font-bold px-20 py-5 w-full h-full text-white text-center bg-gray-900 margin-auto">
+  return <div className="font-mono font-bold px-20 py-10 w-full h-full text-white text-center bg-gray-900 margin-auto">
         <h1 className="text-4xl">Jak grać</h1>
 
         <br></br>
@@ -15,6 +15,7 @@ const Help: React.FC = () => {
           - Literka która jest w słowie do zgadnięcia, ale nie znajduje się na dobrej pozycji, zostanie podświetlona na żółto.
           - Literka która w ogóle nie występuje w słowie do zgadnięcia, zostanie podświetlona na szaro.
         </article>
+        <br></br>
         <br></br>
         <br></br>
         <br></br>
