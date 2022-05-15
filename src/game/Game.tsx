@@ -7,14 +7,14 @@ import { GameContendContext } from "../App";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Notification from "../components/Notification";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
 import { cursorTo } from "readline";
 
 enum GameStatus {
   IN_PROGRESS,
   WON,
-  LOST
+  LOST,
 }
 
 const Game: React.FC = () => {
@@ -32,7 +32,7 @@ const Game: React.FC = () => {
   }
 
   const content = useContext(GameContendContext);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
   const [columns, setColumns] = useState(8);
   const [rows, setRows] = useState(6);
@@ -95,7 +95,7 @@ const Game: React.FC = () => {
     const lettersColored: GameElementType[] = innerInput
       .split("")
       .map((letter, id) => {
-        let color: ColorType = "GRAY";
+        let color: ColorType = "MISSED";
         if (content.wordOfDay?.toUpperCase().includes(letter)) {
           color = "YELLOW";
         }
@@ -119,22 +119,26 @@ const Game: React.FC = () => {
   }, [innerInput, gameState, enter, content]);
 
   useEffect(() => {
-    if(gameState.rowsNumber == 0)
-      return;
+    if (gameState.rowsNumber == 0) return;
 
-    const lastRow = gameState.rows[gameState.rowsNumber-1]
-    const greenTailsCount = lastRow.elements.filter(el => el.color === 'GREEN').length;
+    const lastRow = gameState.rows[gameState.rowsNumber - 1];
+    const greenTailsCount = lastRow.elements.filter(
+      (el) => el.color === "GREEN"
+    ).length;
 
-    if(greenTailsCount === lastRow.length && lastRow.length === content.wordOfDay?.length){
+    if (
+      greenTailsCount === lastRow.length &&
+      lastRow.length === content.wordOfDay?.length
+    ) {
       setGameStatus(GameStatus.WON);
       return;
     }
 
-    if(maxRows === gameState.rowsNumber){
+    if (maxRows === gameState.rowsNumber) {
       setGameStatus(GameStatus.LOST);
       return;
     }
-  }, [gameState])
+  }, [gameState]);
 
   const handleEnter = () => {
     setEnter(true);
@@ -143,29 +147,35 @@ const Game: React.FC = () => {
 
   const handleGameFinish = () => {
     //TODO: go to main menu
-    navigate('/')
+    navigate("/");
   };
 
   const [notificationTitle, notificationMsg] = (() => {
-    if(gameStatus == GameStatus.WON)
+    if (gameStatus == GameStatus.WON)
       return ["Wygrałeś", "Gratulacje! Udało ci się odgadnąć słowo."];
-    else if(gameStatus == GameStatus.LOST)
+    else if (gameStatus == GameStatus.LOST)
       return ["Przgrałeś", "Niestety nie udało si się odgadnąć słowa."];
-    else
-      return ["", ""];
+    else return ["", ""];
   })();
 
   return (
     <div className="w-full m-auto">
-        <Notification title={notificationTitle} msg={notificationMsg} open={gameStatus !== GameStatus.IN_PROGRESS} handleClose={handleGameFinish}>
-          <button
-            className={"rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"}
-            style={{margin: '1vh'}}
-            onClick={handleGameFinish}
-          >
-            MENU
-          </button>
-        </Notification>
+      <Notification
+        title={notificationTitle}
+        msg={notificationMsg}
+        open={gameStatus !== GameStatus.IN_PROGRESS}
+        handleClose={handleGameFinish}
+      >
+        <button
+          className={
+            "rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"
+          }
+          style={{ margin: "1vh" }}
+          onClick={handleGameFinish}
+        >
+          MENU
+        </button>
+      </Notification>
       <Board
         cols={columns}
         rows={rows}
