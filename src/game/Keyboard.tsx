@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { ColorType, GameState } from "../const/types";
+import React, { useCallback, useEffect } from "react";
+import { ColorType } from "../const/types";
 import { LETTER_BOTTOM, LETTER_MID, LETTER_TOP } from "../const/const";
 
 interface KeyProps {
@@ -25,14 +25,14 @@ interface KeyboardProps {
   handleEnter: () => void;
   handleBackspace: () => void;
   handleLetter: (val: string) => void;
-  gameState: GameState;
+  colors: {[k: string]: ColorType}
 }
 
 const Keyboard: React.FC<KeyboardProps> = ({
   handleBackspace,
   handleLetter,
   handleEnter,
-  gameState,
+  colors
 }) => {
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
@@ -59,23 +59,23 @@ const Keyboard: React.FC<KeyboardProps> = ({
     }
   };
 
-  // todo get colors for each char
-  const letter = [...LETTER_TOP, ...LETTER_MID, ...LETTER_BOTTOM];
+  // // todo get colors for each char
+  // const letter = [...LETTER_TOP, ...LETTER_MID, ...LETTER_BOTTOM];
 
-  const [colors, setColors] = useState(
-    Object.fromEntries(letter.map((key) => [key, "GRAY" as ColorType]))
-  );
+  // const [colors, setColors] = useState(
+  //   Object.fromEntries(letter.map((key) => [key, "GRAY" as ColorType]))
+  // );
 
-  useEffect(() => {
-    const innerColors = { ...colors };
+  // useEffect(() => {
+  //   const innerColors = { ...colors };
 
-    gameState.rows.map((row) => {
-      row.elements.map((el) => {
-        innerColors[el.letter] = el.color;
-      });
-    });
-    setColors(innerColors);
-  }, [gameState, setColors]);
+  //   gameState.rows.map((row) => {
+  //     row.elements.map((el) => {
+  //       innerColors[el.letter] = el.color;
+  //     });
+  //   });
+  //   setColors(innerColors);
+  // }, [gameState, setColors]);
 
   const getColor = useCallback(
     (col: ColorType) => {
