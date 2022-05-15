@@ -219,12 +219,7 @@ const Game: React.FC = () => {
         hackFunctions={[
           handleDeleteColumn,
           handleAddRow,
-<<<<<<< HEAD
           handleGetWordLength,
-=======
-          handleDeleteColumn,
-
->>>>>>> main
           handleDeleteColumn,
         ]}
         questionFunction={() => setShowQuestion(true)}
