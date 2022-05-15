@@ -20,7 +20,7 @@ jobs:
             - ./node_modules
       - run:
           name: Build React App
-          command: npm run build
+          command: npm run deploy
       - save_cache:
           key: app-build-cache-{{ .Branch }}
           paths:
