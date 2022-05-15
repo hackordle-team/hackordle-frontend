@@ -8,7 +8,9 @@ import { useNavigate } from "react-router-dom";
 
 // const MULTI_SERVER_URL = "";
 
-const Multiplayer: React.FC = () => {
+const Multiplayer: React.FC<{
+  onWordChange: (word: string) => void;
+}> = ({ onWordChange }) => {
   const webSocket = useRef<WebSocket>();
   const [waiting, setWaiting] = useState(true);
   const [lost, setLost] = useState(false);
@@ -31,6 +33,7 @@ const Multiplayer: React.FC = () => {
 
       if (d?.type == "start") {
         setWaiting(false);
+        onWordChange(d?.word);
       }
       if (d?.status == "win") {
         setLost(true);

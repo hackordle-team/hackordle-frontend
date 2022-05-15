@@ -25,6 +25,8 @@ const App: React.FC = () => {
     })();
   }, []);
 
+  console.log(word);
+
   return (
     <GameContendContext.Provider
       value={{ dictionary, questions, wordOfDay: word }}
@@ -33,7 +35,10 @@ const App: React.FC = () => {
         <Navbar />
         <Routes>
           <Route path="/" element={<Singleplayer />} />
-          <Route path="multi" element={<Multiplayer />} />
+          <Route
+            path="multi"
+            element={<Multiplayer onWordChange={setWord} />}
+          />
           <Route path="multi/:gameId" element={<MultiplayerGame />} />
           <Route path="help" element={<Help />} />
           <Route path="*" element={<h1>This page doesn&apos;t exist</h1>} />
