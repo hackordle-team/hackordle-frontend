@@ -13,7 +13,7 @@ import ReactLoading from "react-loading";
 import { LETTER } from "../const/const";
 
 const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
-const DEFAULT_COLUMNS = 8;
+const DEFAULT_COLUMNS = 10;
 const DEFAULT_ROWS = 8;
 
 interface DailyGameState {

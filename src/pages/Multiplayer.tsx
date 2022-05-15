@@ -107,7 +107,7 @@ const Multiplayer: React.FC = () => {
           />
         </div>
         <div className="w-2/5">
-          <BlurredBoard cols={10} rows={8} gameState={opponentState} />
+          <BlurredBoard cols={10} rows={10} gameState={opponentState} />
         </div>
       </div>
     </Wrapper>
