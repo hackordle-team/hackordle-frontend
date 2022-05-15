@@ -67,10 +67,11 @@ const Game: React.FC = () => {
 
   const handleDeleteColumn = useCallback(() => {
     if (content.wordOfDay && content.wordOfDay.length < columns) {
+      setInnerInput((prevState) => prevState.slice(0, Math.min(columns-1, prevState.length)))
       setColumns((prevState) => prevState - 1);
       makeToast("Udało się usunąć kolumnę");
     } else makeToast("Osiągnięto najmniejszą liczbę kolumn");
-  }, [columns, content.wordOfDay]);
+  }, [columns, content.wordOfDay, innerInput]);
 
   const handleAddRow = useCallback(() => {
     setRows((prevState) => prevState + 1);
@@ -111,6 +112,17 @@ const Game: React.FC = () => {
     setColors(innerColors);
     console.log(colors);
   }, [gameState, setColors]);
+  const handleGetWordLength = useCallback(() => {
+    const wordLn = innerInput.length;
+    if (content.wordOfDay) {
+      if (wordLn > content.wordOfDay.length)
+        makeToast("Twoje słowo jest dłuższe");
+      else if (wordLn == content.wordOfDay.length)
+        makeToast("Twoje słowo i słowo dnia są tej samej długości");
+      else
+        makeToast("Twoje słowo jest krótsze");
+    }
+  }, [innerInput, content.wordOfDay]);
 
   useEffect(() => {
     if (!enter) {
@@ -207,11 +219,11 @@ const Game: React.FC = () => {
     navigate("/");
   };
 
-  const [notificationTitle, notificationMsg] = (() => {
+  const [notificationTitle, notificationMsg, notificationWordOfDay] = (() => {
     if (gameStatus == GameStatus.WON)
-      return ["Wygrałeś", "Gratulacje! Udało ci się odgadnąć słowo."];
+      return ["Wygrałeś", "Gratulacje! Udało ci się odgadnąć słowo.", content.wordOfDay];
     else if (gameStatus == GameStatus.LOST)
-      return ["Przgrałeś", "Niestety nie udało si się odgadnąć słowa."];
+      return ["Przegrałeś", "Niestety nie udało si się odgadnąć słowa.", content.wordOfDay];
     else return ["", ""];
   })();
 
@@ -220,6 +232,7 @@ const Game: React.FC = () => {
       <Notification
         title={notificationTitle}
         msg={notificationMsg}
+        wordOfDay={notificationWordOfDay}
         open={gameStatus !== GameStatus.IN_PROGRESS}
         handleClose={handleGameFinish}
       >
@@ -244,8 +257,7 @@ const Game: React.FC = () => {
         hackFunctions={[
           handleDeleteColumn,
           handleAddRow,
-          handleDeleteColumn,
-
+          handleGetWordLength,
           handleDeleteLetter,
         ]}
         questionFunction={() => setShowQuestion(true)}
@@ -262,13 +274,16 @@ const Game: React.FC = () => {
         <Question
           question={content.questions?.[0]}
           hackName={"hack"}
-          onResult={(correctAnswer) => {
-            setShowQuestion(false);
-            if (correctAnswer) {
-              console.log("GOOD ONE");
-              currentHack();
+          onResult={
+            (correctAnswer) => {
+              setShowQuestion(false)
+              if (correctAnswer)
+                currentHack();
+               else 
+                setGameStatus(GameStatus.LOST);
             }
-          }}
+            
+          }
         />
       )}
     </div>

@@ -47,7 +47,7 @@ const Keyboard: React.FC<KeyboardProps> = ({
     window.addEventListener("keydown", listener);
 
     return () => window.removeEventListener("keydown", listener);
-  }, []);
+  }, [handleLetter]);
 
   const handleClick = (val: string) => {
     if (val === "DELETE") {
