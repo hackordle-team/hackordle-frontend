@@ -5,6 +5,7 @@ import BlurredBoard from "../game/BlurredBoard";
 import { GameState } from "../const/types";
 import Notification from "../components/Notification";
 import { useNavigate } from "react-router-dom";
+import ReactLoading from "react-loading";
 
 // const MULTI_SERVER_URL = "";
 
@@ -59,58 +60,76 @@ const Multiplayer: React.FC = () => {
   };
 
   return (
-    <Wrapper>
-      <div className="flex w-full space-x-3">
-        <Notification
-          title={notificationTitle}
-          msg={notificationMsg}
-          wordOfDay={notificationWordOfDay}
-          open={lost}
-          handleClose={handleGameFinish}
-        >
-          <button
-            className={
-              "rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"
-            }
-            style={{ margin: "1vh" }}
-            onClick={handleGameFinish}
-          >
-            MENU
-          </button>
-        </Notification>
+    <>
+      {waiting && (
+        <Wrapper>
+          <div className="justify-center items-center w-full flex h-full overflow-hide flex-col">
+            <ReactLoading
+              type={"bars"}
+              color={"white"}
+              height={100}
+              width={100}
+            />
+            <p className="text-lg text-white">Waiting for a player...</p>
+          </div>
+        </Wrapper>
+      )}
+      {!waiting && (
+        <Wrapper>
+          <div className="flex w-full space-x-3">
+            <Notification
+              title={notificationTitle}
+              msg={notificationMsg}
+              wordOfDay={notificationWordOfDay}
+              open={lost}
+              handleClose={handleGameFinish}
+            >
+              <button
+                className={
+                  "rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"
+                }
+                style={{ margin: "1vh" }}
+                onClick={handleGameFinish}
+              >
+                MENU
+              </button>
+            </Notification>
 
-        <div className="w-3/5">
-          <Game
-            waiting={waiting}
-            isMulti={true}
-            onWin={() => {
-              const obj = {
-                status: "win",
-              };
-              //console.log("on update");
-              if (webSocket.current?.readyState === WebSocket.OPEN) {
-                console.log("sending");
-                webSocket.current?.send(JSON.stringify(obj).toString());
-              }
-            }}
-            onUpdate={(n) => {
-              const obj = {
-                status: "update",
-                data: n,
-              };
-              //console.log("on update");
-              if (webSocket.current?.readyState === WebSocket.OPEN) {
-                console.log("sending");
-                webSocket.current?.send(JSON.stringify(obj).toString());
-              }
-            }}
-          />
-        </div>
-        <div className="w-2/5">
-          <BlurredBoard cols={10} rows={10} gameState={opponentState} />
-        </div>
-      </div>
-    </Wrapper>
+            <div className="w-3/5">
+              <Game
+                isMulti={true}
+                onWin={() => {
+                  const obj = {
+                    status: "win",
+                  };
+                  //console.log("on update");
+                  if (webSocket.current?.readyState === WebSocket.OPEN) {
+                    console.log("sending");
+                    webSocket.current?.send(JSON.stringify(obj).toString());
+                  }
+                }}
+                onUpdate={(n) => {
+                  const obj = {
+                    status: "update",
+                    data: n,
+                  };
+                  //console.log("on update");
+                  if (webSocket.current?.readyState === WebSocket.OPEN) {
+                    console.log("sending");
+                    webSocket.current?.send(JSON.stringify(obj).toString());
+                  }
+                }}
+              />
+            </div>
+            {!waiting && (
+              <div className="w-2/5">
+                <BlurredBoard cols={10} rows={10} gameState={opponentState} />
+              </div>
+            )}
+          </div>
+        </Wrapper>
+      )}
+    </>
   );
 };
 
