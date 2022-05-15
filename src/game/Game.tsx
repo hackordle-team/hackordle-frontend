@@ -9,19 +9,11 @@ import Notification from "../components/Notification";
 import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
 import { makeToast } from "../components/Toast";
-import ReactLoading from "react-loading";
 import { LETTER } from "../const/const";
 
 const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
 const DEFAULT_COLUMNS = 10;
 const DEFAULT_ROWS = 8;
-
-interface DailyGameState {
-  gameState: GameState;
-  date: string;
-  rows: number;
-  columns: number;
-}
 
 enum GameStatus {
   IN_PROGRESS,
@@ -29,20 +21,28 @@ enum GameStatus {
   LOST,
 }
 
+interface DailyGameState {
+  gameState: GameState;
+  date: string;
+  rows: number;
+  columns: number,
+  status: GameStatus;
+}
+
 interface GameProps {
   isMulti: boolean;
   onUpdate?: (val: GameState) => void;
-  waiting?: boolean;
   onWin?: () => void;
 }
 
-const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
+const Game: React.FC<GameProps> = ({ isMulti, onUpdate, onWin }) => {
   const content = useContext(GameContendContext);
-  console.log(waiting);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
   const [columns, setColumns] = useState(DEFAULT_COLUMNS);
   const [rows, setRows] = useState(DEFAULT_ROWS);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [questionSelected, setQuestionSelected] = useState(false);
   const [gameState, setGameState] = useState<GameState>({
     rowsNumber: 0,
     rows: [],
@@ -207,6 +207,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
         setGameState(dailyGameState.gameState);
         setRows(dailyGameState.rows);
         setColumns(dailyGameState.columns);
+        setGameStatus(dailyGameState.status);
       }
     }
   }, []);
@@ -224,19 +225,32 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
         date: new Date().toISOString().slice(0, 10),
         rows: rows,
         columns: columns,
+        status: gameStatus
       };
       const gameStateString = JSON.stringify(dailyGameState);
       console.log(`save gameState`);
       localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
     }
-  }, [gameState, rows, columns]);
+  }, [gameState, rows, columns, gameStatus]);
+
+  useEffect(() => {
+    console.log(content.questions)
+    if (showQuestion && content.questions){
+      const max = content.questions.length;
+      const min = 0;
+      const val = Math.floor(Math.random() * (max - min)) + min;
+      console.log(val);
+      setCurrentQuestion(val);
+      setQuestionSelected(true);
+    }
+  }, [showQuestion])
 
   const handleEnter = () => {
     setEnter(true);
   };
 
   const handleGameFinish = () => {
-    navigate("/");
+    navigate("/help");
   };
 
   const [notificationTitle, notificationMsg, notificationWordOfDay] = (() => {
@@ -256,85 +270,67 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
   })();
 
   return (
-    <>
-      {waiting && (
-        <div className="justify-center items-center w-full flex h-full ">
-          <ReactLoading
-            type={"bars"}
-            color={"#3BACB6"}
-            height={100}
-            width={100}
-          />
-        </div>
-      )}
-      {!waiting && (
-        <div className="w-full m-auto">
-          <Notification
-            title={notificationTitle}
-            msg={notificationMsg}
-            wordOfDay={notificationWordOfDay}
-            open={gameStatus !== GameStatus.IN_PROGRESS}
-            handleClose={handleGameFinish}
-          >
-            <button
-              className={
-                "rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"
-              }
-              style={{ margin: "1vh" }}
-              onClick={handleGameFinish}
-            >
-              MENU
-            </button>
-          </Notification>
-          <Board
-            cols={columns}
-            rows={rows}
-            gameState={gameState}
-            innerState={innerInput}
-          />
-          <Hackbar
-            hackNames={[
-              "REMOVE_COL",
-              "ADD_ROW",
-              "CHECK_LENGTH",
-              "REMOVE_LETTER",
-            ]}
-            hackFunctions={[
-              handleDeleteColumn,
-              handleAddRow,
-              handleGetWordLength,
-              handleDeleteLetter,
-            ]}
-            questionFunction={() => setShowQuestion(true)}
-            callbackMethod={handleHackMethod}
-            images={[
-              "remove_col.png",
-              "add_row.png",
-              "check_length.png",
-              "remove_letter.png",
-            ]}
-          />
-          <Keyboard
-            handleBackspace={handleBackspace}
-            handleLetter={handleLetter}
-            handleEnter={handleEnter}
-            colors={colors}
-          />
+    <div className="w-full m-auto">
+      <Notification
+        title={notificationTitle}
+        msg={notificationMsg}
+        wordOfDay={notificationWordOfDay}
+        open={gameStatus !== GameStatus.IN_PROGRESS}
+        handleClose={handleGameFinish}
+      >
+        <button
+          className={
+            "rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"
+          }
+          style={{ margin: "1vh" }}
+          onClick={handleGameFinish}
+        >
+          MENU
+        </button>
+      </Notification>
+      <Board
+        cols={columns}
+        rows={rows}
+        gameState={gameState}
+        innerState={innerInput}
+      />
+      <Hackbar
+        hackNames={["REMOVE_COL", "ADD_ROW", "CHECK_LENGTH", "REMOVE_LETTER"]}
+        hackFunctions={[
+          handleDeleteColumn,
+          handleAddRow,
+          handleGetWordLength,
+          handleDeleteLetter,
+        ]}
+        questionFunction={() => setShowQuestion(true)}
+        callbackMethod={handleHackMethod}
+        images={[
+          "remove_col.png",
+          "add_row.png",
+          "check_length.png",
+          "remove_letter.png",
+        ]}
+      />
+      <Keyboard
+        handleBackspace={handleBackspace}
+        handleLetter={handleLetter}
+        handleEnter={handleEnter}
+        colors={colors}
+      />
 
-          {showQuestion && (
-            <Question
-              question={content.questions?.[0]}
-              hackName={"hack"}
-              onResult={(correctAnswer) => {
-                setShowQuestion(false);
-                if (correctAnswer) currentHack();
-                else setGameStatus(GameStatus.LOST);
-              }}
-            />
-          )}
-        </div>
+      {showQuestion && questionSelected && (
+        <Question
+          question={content.questions?.at(currentQuestion)}
+          hackName={"hack"}
+          onResult={(correctAnswer) => {
+            setQuestionSelected(false);
+            setShowQuestion(false);
+            if (correctAnswer) currentHack();
+            else setGameStatus(GameStatus.LOST);
+          }}
+        />
       )}
-    </>
+    </div>
   );
 };
 
