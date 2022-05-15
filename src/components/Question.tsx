@@ -35,13 +35,6 @@ interface AnswerButtonState {
   state: AnswerButtonStatus;
 }
 
-const defaultButtonStates = [
-  { selected: false, state: AnswerButtonStatus.NONE },
-  { selected: false, state: AnswerButtonStatus.NONE },
-  { selected: false, state: AnswerButtonStatus.NONE },
-  { selected: false, state: AnswerButtonStatus.NONE },
-];
-
 const Question: React.FC<QuestionProps> = ({
   question,
   hackName,
@@ -52,12 +45,22 @@ const Question: React.FC<QuestionProps> = ({
     AnswerStatus.WAITING_FOR_ANSWER
   );
   const [answerButtonStates, setAnswerButtonStates] =
-    useState<AnswerButtonState[]>(defaultButtonStates);
+    useState<AnswerButtonState[]>([
+      { selected: false, state: AnswerButtonStatus.NONE },
+      { selected: false, state: AnswerButtonStatus.NONE },
+      { selected: false, state: AnswerButtonStatus.NONE },
+      { selected: false, state: AnswerButtonStatus.NONE },
+    ]);
 
   useEffect(() => {
     setAnswerStatus(AnswerStatus.WAITING_FOR_ANSWER);
     setOpen(true);
-    setAnswerButtonStates(defaultButtonStates);
+    setAnswerButtonStates([
+      { selected: false, state: AnswerButtonStatus.NONE },
+      { selected: false, state: AnswerButtonStatus.NONE },
+      { selected: false, state: AnswerButtonStatus.NONE },
+      { selected: false, state: AnswerButtonStatus.NONE },
+    ]);
   }, [question]);
 
   const title = `Odpowiedz na pytanie, aby zdobyć hacka "${hackName}"`;
@@ -76,7 +79,7 @@ const Question: React.FC<QuestionProps> = ({
     return () => {
       if (answerStatus === AnswerStatus.WAITING_FOR_ANSWER) {
         setAnswerButtonStates(
-          defaultButtonStates.map((el, idx) => {
+          answerButtonStates.map((el, idx) => {
             if (idx === answerIdx) {
               el.selected = true;
               el.state = AnswerButtonStatus.PULSE;
