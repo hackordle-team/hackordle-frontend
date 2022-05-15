@@ -228,11 +228,10 @@ const Game: React.FC = () => {
           onResult={
             (correctAnswer) => {
               setShowQuestion(false)
-              if (correctAnswer)
+              if (correctAnswer === true)
                 console.log("GOOD ONE")
                 currentHack();
               }
-            
           }
         />
       )}
