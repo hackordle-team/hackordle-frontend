@@ -16,17 +16,17 @@ const getGameRow = (
   innerState: string
 ) => {
   let letters: JSX.Element[] = [];
-  let blanksNumber: number = cols;
+  let blanksNumber: number = cols
 
   if (row < gameState.rowsNumber) {
-    letters = gameState.rows[row].elements.map((boardElement, i) => (
+    letters = gameState.rows?.[row].elements.map((boardElement, i) => (
       <BoardElement
         key={i}
         letter={boardElement.letter}
         color={boardElement.color}
       />
     ));
-    blanksNumber = cols - gameState.rows[row].length;
+    blanksNumber = cols - gameState.rows?.[row]?.length;
   } else if (row == gameState.rowsNumber) {
     letters = innerState
       ?.split("")

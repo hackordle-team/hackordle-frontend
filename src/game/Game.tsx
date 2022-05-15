@@ -4,8 +4,10 @@ import Keyboard from "./Keyboard";
 import Hackbar from "./Hackbar";
 import { ColorType, GameElementType, GameState } from "../const/types";
 import { GameContendContext } from "../App";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Notification from "../components/Notification";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
 
 const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
@@ -18,15 +20,28 @@ interface DailyGameState {
 enum GameStatus {
   IN_PROGRESS,
   WON,
-  LOST
+  LOST,
 }
 
 const Game: React.FC = () => {
+
+  function makeToansify(message: string) {
+    toast.info(message, {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      });
+  }
+
   const content = useContext(GameContendContext);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
-  const [columns, setColumns] = useState(10);
-  const [maxRows, setMaxRows] = useState(8); //maksymalna liczba prób
+  const [columns, setColumns] = useState(8);
+  const [rows, setRows] = useState(6);
   const [gameState, setGameState] = useState<GameState>({
     rowsNumber: 0,
     rows: [],
@@ -34,6 +49,12 @@ const Game: React.FC = () => {
   const [gameStatus, setGameStatus] = useState(GameStatus.IN_PROGRESS);
   const [enter, setEnter] = useState(false);
   const [showQuestion, setShowQuestion] = useState(false);
+  const defFunc = () => {console.log("init")};
+  const [currentHack, setCurrentHack] = useState(() => defFunc); 
+
+  const handleHackMethod = useCallback((func: () => void) => {
+    setCurrentHack((prevState) => func);
+  }, []);
 
   const handleBackspace = useCallback(() => {
     setInnerInput((prevState) => prevState.slice(0, -1));
@@ -47,6 +68,26 @@ const Game: React.FC = () => {
     },
     [columns]
   );
+  
+  const handleDeleteColumn = useCallback(
+    () => {
+      if (content.wordOfDay && content.wordOfDay.length < columns) {
+        setColumns((prevState) => prevState - 1)
+        makeToansify("Udało się usunąć kolumnę")
+      } else
+        makeToansify("Osiągnięto najmniejszą liczbę kolumn")
+    },
+    [columns, content.wordOfDay]
+  )
+
+  const handleAddRow = useCallback(
+    () => {
+      setRows((prevState) => ( prevState + 1
+      ));
+      makeToansify("Dodano nową próbę")
+    },
+    []
+  )
 
   useEffect(() => {
     if (!enter) {
@@ -59,7 +100,7 @@ const Game: React.FC = () => {
     const lettersColored: GameElementType[] = innerInput
       .split("")
       .map((letter, id) => {
-        let color: ColorType = "GRAY";
+        let color: ColorType = "MISSED";
         if (content.wordOfDay?.toUpperCase().includes(letter)) {
           color = "YELLOW";
         }
@@ -83,22 +124,26 @@ const Game: React.FC = () => {
   }, [innerInput, gameState, enter, content]);
 
   useEffect(() => {
-    if(gameState.rowsNumber == 0)
-      return;
+    if (gameState.rowsNumber == 0) return;
 
-    const lastRow = gameState.rows[gameState.rowsNumber-1]
-    const greenTailsCount = lastRow.elements.filter(el => el.color === 'GREEN').length;
+    const lastRow = gameState.rows[gameState.rowsNumber - 1];
+    const greenTailsCount = lastRow.elements.filter(
+      (el) => el.color === "GREEN"
+    ).length;
 
-    if(greenTailsCount === lastRow.length && lastRow.length === content.wordOfDay?.length){
+    if (
+      greenTailsCount === lastRow.length &&
+      lastRow.length === content.wordOfDay?.length
+    ) {
       setGameStatus(GameStatus.WON);
       return;
     }
 
-    if(maxRows === gameState.rowsNumber){
+    if (rows === gameState.rowsNumber) {
       setGameStatus(GameStatus.LOST);
       return;
     }
-  }, [gameState])
+  }, [gameState]);
 
   useEffect(() => {
     const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
@@ -124,7 +169,6 @@ const Game: React.FC = () => {
 
   const handleEnter = () => {
     setEnter(true);
-    //console.log("Enter pressed");
   };
 
   const handleGameFinish = () => {
@@ -132,39 +176,47 @@ const Game: React.FC = () => {
   };
 
   const [notificationTitle, notificationMsg] = (() => {
-    if(gameStatus == GameStatus.WON)
+    if (gameStatus == GameStatus.WON)
       return ["Wygrałeś", "Gratulacje! Udało ci się odgadnąć słowo."];
-    else if(gameStatus == GameStatus.LOST)
+    else if (gameStatus == GameStatus.LOST)
       return ["Przgrałeś", "Niestety nie udało si się odgadnąć słowa."];
-    else
-      return ["", ""];
+    else return ["", ""];
   })();
 
   return (
     <div className="w-full m-auto">
-        <Notification title={notificationTitle} msg={notificationMsg} open={gameStatus !== GameStatus.IN_PROGRESS} handleClose={handleGameFinish}>
-          <button
-            className={"rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"}
-            style={{margin: '1vh'}}
-            onClick={handleGameFinish}
-          >
-            MENU
-          </button>
-        </Notification>
+      <Notification
+        title={notificationTitle}
+        msg={notificationMsg}
+        open={gameStatus !== GameStatus.IN_PROGRESS}
+        handleClose={handleGameFinish}
+      >
+        <button
+          className={
+            "rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"
+          }
+          style={{ margin: "1vh" }}
+          onClick={handleGameFinish}
+        >
+          MENU
+        </button>
+      </Notification>
       <Board
         cols={columns}
-        rows={8}
+        rows={rows}
         gameState={gameState}
         innerState={innerInput}
       />
       <Hackbar
         hackNames={["HACK 1", "HACK 2", "HACK 3", "HACK 4"]}
         hackFunctions={[
-          () => setShowQuestion(true),
-          () => setShowQuestion(true),
-          () => setShowQuestion(true),
-          () => setShowQuestion(true),
+          handleDeleteColumn,
+          handleAddRow,
+          handleDeleteColumn,
+          handleDeleteColumn,
         ]}
+        questionFunction = {() => setShowQuestion(true)}
+        callbackMethod = {handleHackMethod}
       />
       <Keyboard
         handleBackspace={handleBackspace}
@@ -172,11 +224,21 @@ const Game: React.FC = () => {
         handleEnter={handleEnter}
         gameState={gameState}
       />
+      <ToastContainer />
+
       {showQuestion && (
         <Question
           question={content.questions?.[0]}
           hackName={"hack"}
-          onResult={() => setShowQuestion(false)}
+          onResult={
+            (correctAnswer) => {
+              setShowQuestion(false)
+              if (correctAnswer)
+                console.log("GOOD ONE")
+                currentHack();
+              }
+            
+          }
         />
       )}
     </div>

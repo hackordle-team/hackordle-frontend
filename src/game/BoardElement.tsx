@@ -24,7 +24,8 @@ const BoardElement: React.FC<BoardElementProps> = ({ color, letter }) => {
         "w-12 h-12 rounded-full text-center flex items-center justify-center font-bold text-white text-3xl",
         color == "GRAY" && "bg-gray-500",
         color == "GREEN" && "bg-green-600",
-        color == "YELLOW" && "bg-yellow-500"
+        color == "YELLOW" && "bg-yellow-500",
+        color == "MISSED" && "bg-gray-700"
       )}
     >
       {letter?.toUpperCase()}
