@@ -5,9 +5,9 @@ const Help: React.FC = () => {
     <div className="font-bold px-20 py-5 w-full h-full text-white text-center bg-gray-900 margin-auto">
       <h1 className="text-4xl">Jak grać</h1>
 
-      <br></br>
-      <br></br>
-      <br></br>
+      <br />
+      <br />
+      <br />
       <article className="text-lg">
         Twoim zadaniem jest zgadnąć słowo, które jest długości od 5 do 10
         włącznie. Zgaduje kolejne słowa a dowiesz się: - Literka która jest na
@@ -17,9 +17,9 @@ const Help: React.FC = () => {
         - Literka która w ogóle nie występuje w słowie do zgadnięcia, zostanie
         podświetlona na szaro.
       </article>
-      <br></br>
-      <br></br>
-      <br></br>
+      <br />
+      <br />
+      <br />
       <article className="text-lg">
         W celu ułatwienia sobie zadania, możesz skorzystać z jednego z 4
         ułatwień: - Usunięcie ostatniej kolumny (jeżeli słowo do zgadnięcia nie
