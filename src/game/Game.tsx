@@ -9,6 +9,7 @@ import Notification from "../components/Notification";
 import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
 import { makeToast } from "../components/Toast";
+import { LETTER } from "../const/const";
 
 const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
 const DEFAULT_COLUMNS = 8;
@@ -27,7 +28,12 @@ enum GameStatus {
   LOST,
 }
 
-const Game: React.FC = () => {
+interface GameProps {
+  isMulti: boolean,
+  onUpdate?: (val: GameState) => void;
+}
+
+const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
   const content = useContext(GameContendContext);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
@@ -44,6 +50,12 @@ const Game: React.FC = () => {
     console.log("init");
   };
   const [currentHack, setCurrentHack] = useState(() => defFunc);
+
+  const [colors, setColors] = useState(
+    Object.fromEntries(LETTER.map((key) => [key, "GRAY" as ColorType]))
+  );
+
+  useEffect(() => onUpdate?.(gameState), [gameState]);
 
   const handleHackMethod = useCallback((func: () => void) => {
     setCurrentHack(() => func);
@@ -64,7 +76,9 @@ const Game: React.FC = () => {
 
   const handleDeleteColumn = useCallback(() => {
     if (content.wordOfDay && content.wordOfDay.length < columns) {
-      setInnerInput((prevState) => prevState.slice(0, Math.min(columns-1, prevState.length)))
+      setInnerInput((prevState) =>
+        prevState.slice(0, Math.min(columns - 1, prevState.length))
+      );
       setColumns((prevState) => prevState - 1);
       makeToast("Udało się usunąć kolumnę");
     } else makeToast("Osiągnięto najmniejszą liczbę kolumn");
@@ -75,6 +89,40 @@ const Game: React.FC = () => {
     makeToast("Dodano nową próbę");
   }, []);
 
+  const handleDeleteLetter = useCallback(() => {
+    const innerColors = { ...colors };
+    let count = 0;
+    let deleted = undefined;
+    LETTER.sort(() => 0.5 - Math.random()).map((el) => {
+      if (
+        count === 0 &&
+        !content.wordOfDay?.toUpperCase().includes(el) &&
+        innerColors[el] === "GRAY"
+      ) {
+        count += 1;
+        deleted = el;
+        innerColors[el] = "MISSED";
+      }
+    });
+    setColors(innerColors);
+    if (count === 1) {
+      makeToast(`Wykreślono litere ${deleted}`);
+    } else {
+      makeToast("Brak litery do usuniecia");
+    }
+  }, [colors, setColors, content.wordOfDay]);
+
+  useEffect(() => {
+    const innerColors = { ...colors };
+
+    gameState.rows.map((row) => {
+      row.elements.map((el) => {
+        innerColors[el.letter] = el.color;
+      });
+    });
+    setColors(innerColors);
+    console.log(colors);
+  }, [gameState, setColors]);
   const handleGetWordLength = useCallback(() => {
     const wordLn = innerInput.length;
     if (content.wordOfDay) {
@@ -82,8 +130,7 @@ const Game: React.FC = () => {
         makeToast("Twoje słowo jest dłuższe");
       else if (wordLn == content.wordOfDay.length)
         makeToast("Twoje słowo i słowo dnia są tej samej długości");
-      else
-        makeToast("Twoje słowo jest krótsze");
+      else makeToast("Twoje słowo jest krótsze");
     }
   }, [innerInput, content.wordOfDay]);
 
@@ -144,6 +191,9 @@ const Game: React.FC = () => {
   }, [gameState]);
 
   useEffect(() => {
+    if(isMulti)
+      return;
+
     const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
     console.log(`retrieve gameState ${retrievedGameState}`);
     if (retrievedGameState) {
@@ -157,6 +207,9 @@ const Game: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if(isMulti)
+      return;
+
     if (
       gameState.rowsNumber > 0 ||
       rows > DEFAULT_ROWS ||
@@ -182,11 +235,19 @@ const Game: React.FC = () => {
     navigate("/");
   };
 
-  const [notificationTitle, notificationMsg] = (() => {
+  const [notificationTitle, notificationMsg, notificationWordOfDay] = (() => {
     if (gameStatus == GameStatus.WON)
-      return ["Wygrałeś", "Gratulacje! Udało ci się odgadnąć słowo."];
+      return [
+        "Wygrałeś",
+        "Gratulacje! Udało ci się odgadnąć słowo.",
+        content.wordOfDay,
+      ];
     else if (gameStatus == GameStatus.LOST)
-      return ["Przgrałeś", "Niestety nie udało si się odgadnąć słowa."];
+      return [
+        "Przegrałeś",
+        "Niestety nie udało si się odgadnąć słowa.",
+        content.wordOfDay,
+      ];
     else return ["", ""];
   })();
 
@@ -195,6 +256,7 @@ const Game: React.FC = () => {
       <Notification
         title={notificationTitle}
         msg={notificationMsg}
+        wordOfDay={notificationWordOfDay}
         open={gameStatus !== GameStatus.IN_PROGRESS}
         handleClose={handleGameFinish}
       >
@@ -220,7 +282,7 @@ const Game: React.FC = () => {
           handleDeleteColumn,
           handleAddRow,
           handleGetWordLength,
-          handleDeleteColumn,
+          handleDeleteLetter,
         ]}
         questionFunction={() => setShowQuestion(true)}
         callbackMethod={handleHackMethod}
@@ -230,23 +292,18 @@ const Game: React.FC = () => {
         handleBackspace={handleBackspace}
         handleLetter={handleLetter}
         handleEnter={handleEnter}
-        gameState={gameState}
+        colors={colors}
       />
 
       {showQuestion && (
         <Question
           question={content.questions?.[0]}
           hackName={"hack"}
-          onResult={
-            (correctAnswer) => {
-              setShowQuestion(false)
-              if (correctAnswer)
-                currentHack();
-               else 
-                setGameStatus(GameStatus.LOST);
-            }
-            
-          }
+          onResult={(correctAnswer) => {
+            setShowQuestion(false);
+            if (correctAnswer) currentHack();
+            else setGameStatus(GameStatus.LOST);
+          }}
         />
       )}
     </div>

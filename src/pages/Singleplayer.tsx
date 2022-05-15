@@ -7,7 +7,7 @@ const Singleplayer: React.FC = () => {
     <Wrapper center>
       <div className="w-full flex justify-center">
         <div className="max-w-min">
-          <Game />
+          <Game isMulti={false}/>
         </div>
       </div>
     </Wrapper>

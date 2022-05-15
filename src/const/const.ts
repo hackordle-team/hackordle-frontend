@@ -62,3 +62,4 @@ export const MockGameState: GameState = {
 export const LETTER_TOP = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
 export const LETTER_MID = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
 export const LETTER_BOTTOM = ["Z", "X", "C", "V", "B", "N", "M"];
+export const LETTER = [...LETTER_TOP, ...LETTER_MID, ...LETTER_BOTTOM];

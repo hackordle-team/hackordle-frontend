@@ -65,7 +65,7 @@ const getGameRow = (cols: number, gameState: GameState, row: number) => {
       <ProgressBar
         green={(counted.GREEN * 100) / sum}
         yellow={(counted.YELLOW * 100) / sum}
-        gray={(counted.GRAY * 100) / sum}
+        gray={(counted.MISSED * 100) / sum}
       />
     );
   }
