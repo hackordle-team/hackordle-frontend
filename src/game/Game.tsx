@@ -16,17 +16,18 @@ const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
 const DEFAULT_COLUMNS = 10;
 const DEFAULT_ROWS = 8;
 
-interface DailyGameState {
-  gameState: GameState;
-  date: string;
-  rows: number;
-  columns: number;
-}
-
 enum GameStatus {
   IN_PROGRESS,
   WON,
   LOST,
+}
+
+interface DailyGameState {
+  gameState: GameState;
+  date: string;
+  rows: number;
+  columns: number,
+  status: GameStatus;
 }
 
 interface GameProps {
@@ -43,6 +44,8 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
   const [innerInput, setInnerInput] = useState<string>("");
   const [columns, setColumns] = useState(DEFAULT_COLUMNS);
   const [rows, setRows] = useState(DEFAULT_ROWS);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [questionSelected, setQuestionSelected] = useState(false);
   const [gameState, setGameState] = useState<GameState>({
     rowsNumber: 0,
     rows: [],
@@ -207,6 +210,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
         setGameState(dailyGameState.gameState);
         setRows(dailyGameState.rows);
         setColumns(dailyGameState.columns);
+        setGameStatus(dailyGameState.status);
       }
     }
   }, []);
@@ -224,19 +228,32 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
         date: new Date().toISOString().slice(0, 10),
         rows: rows,
         columns: columns,
+        status: gameStatus
       };
       const gameStateString = JSON.stringify(dailyGameState);
       console.log(`save gameState`);
       localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
     }
-  }, [gameState, rows, columns]);
+  }, [gameState, rows, columns, gameStatus]);
+
+  useEffect(() => {
+    console.log(content.questions)
+    if (showQuestion && content.questions){
+      const max = content.questions.length;
+      const min = 0;
+      const val = Math.floor(Math.random() * (max - min)) + min;
+      console.log(val);
+      setCurrentQuestion(val);
+      setQuestionSelected(true);
+    }
+  }, [showQuestion])
 
   const handleEnter = () => {
     setEnter(true);
   };
 
   const handleGameFinish = () => {
-    navigate("/");
+    navigate("/help");
   };
 
   const [notificationTitle, notificationMsg, notificationWordOfDay] = (() => {
@@ -321,11 +338,12 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
             colors={colors}
           />
 
-          {showQuestion && (
+          {showQuestion && questionSelected && (
             <Question
-              question={content.questions?.[0]}
+              question={content.questions?.at(currentQuestion)}
               hackName={"hack"}
               onResult={(correctAnswer) => {
+                setQuestionSelected(false);
                 setShowQuestion(false);
                 if (correctAnswer) currentHack();
                 else setGameStatus(GameStatus.LOST);
