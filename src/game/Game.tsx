@@ -29,10 +29,11 @@ enum GameStatus {
 }
 
 interface GameProps {
+  isMulti: boolean,
   onUpdate?: (val: GameState) => void;
 }
 
-const Game: React.FC<GameProps> = ({ onUpdate }) => {
+const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
   const content = useContext(GameContendContext);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
@@ -188,20 +189,26 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
     }
   }, [gameState]);
 
-  // useEffect(() => {
-  //   const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
-  //   console.log(`retrieve gameState ${retrievedGameState}`);
-  //   if (retrievedGameState) {
-  //     const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
-  //     if (dailyGameState.date === new Date().toISOString().slice(0, 10)) {
-  //       setGameState(dailyGameState.gameState);
-  //       setRows(dailyGameState.rows);
-  //       setColumns(dailyGameState.columns);
-  //     }
-  //   }
-  // }, []);
+  useEffect(() => {
+    if(isMulti)
+      return;
+
+    const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
+    console.log(`retrieve gameState ${retrievedGameState}`);
+    if (retrievedGameState) {
+      const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
+      if (dailyGameState.date === new Date().toISOString().slice(0, 10)) {
+        setGameState(dailyGameState.gameState);
+        setRows(dailyGameState.rows);
+        setColumns(dailyGameState.columns);
+      }
+    }
+  }, []);
 
   useEffect(() => {
+    if(isMulti)
+      return;
+
     if (
       gameState.rowsNumber > 0 ||
       rows > DEFAULT_ROWS ||
@@ -213,9 +220,9 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
         rows: rows,
         columns: columns,
       };
-      // const gameStateString = JSON.stringify(dailyGameState);
-      //console.log(`save gameState`);
-      //localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
+      const gameStateString = JSON.stringify(dailyGameState);
+      console.log(`save gameState`);
+      localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
     }
   }, [gameState, rows, columns]);
 
