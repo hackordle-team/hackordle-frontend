@@ -1,4 +1,10 @@
-export type ColorType = "GRAY" | "GREEN" | "YELLOW" | "BLANK" | "INNER";
+export type ColorType =
+  | "GRAY"
+  | "GREEN"
+  | "YELLOW"
+  | "BLANK"
+  | "INNER"
+  | "MISSED";
 
 export type GameElementType = {
   letter: string;
@@ -22,7 +28,7 @@ export type AnswerType = {
 
 export type QuestionType = {
   question: string;
-  answers: AnswerType;
+  answers: AnswerType[];
 };
 
 export type GameContentType = {

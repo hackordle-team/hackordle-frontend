@@ -5,11 +5,14 @@ import { GameState } from "../const/types";
 interface HackbarProps {
     hackName: string;
     hackFunction: () => void;
+    questionFunction: () => void;
+    callbackMethod: (func: () => void) => void;
   }
 
-const HackButton: React.FC<HackbarProps> = ({hackName, hackFunction}) => {   
+const HackButton: React.FC<HackbarProps> = ({hackName, hackFunction, questionFunction, callbackMethod}) => {   
     const execute = () => {
-      hackFunction()
+      callbackMethod(hackFunction);
+      questionFunction()
     } 
     return (
       <div>
