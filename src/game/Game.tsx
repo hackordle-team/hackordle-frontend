@@ -140,6 +140,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
     }
     if (!content.dictionary?.includes(innerInput.toLowerCase())) {
       setEnter(false);
+      makeToast("Hasła nie ma w słowniku")
       return;
     }
     const lettersColored: GameElementType[] = innerInput
