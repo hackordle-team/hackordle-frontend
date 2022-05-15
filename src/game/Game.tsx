@@ -4,11 +4,11 @@ import Keyboard from "./Keyboard";
 import Hackbar from "./Hackbar";
 import { ColorType, GameElementType, GameState } from "../const/types";
 import { GameContendContext } from "../App";
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Notification from "../components/Notification";
 import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
+import {makeToast} from "../components/Toast";
 
 const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
 const DEFAULT_COLUMNS = 8;
@@ -28,19 +28,6 @@ enum GameStatus {
 }
 
 const Game: React.FC = () => {
-
-  function makeToansify(message: string) {
-    toast.info(message, {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      progress: undefined,
-      });
-  }
-
   const content = useContext(GameContendContext);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
@@ -77,9 +64,9 @@ const Game: React.FC = () => {
     () => {
       if (content.wordOfDay && content.wordOfDay.length < columns) {
         setColumns((prevState) => prevState - 1)
-        makeToansify("Udało się usunąć kolumnę")
+        makeToast("Udało się usunąć kolumnę")
       } else
-        makeToansify("Osiągnięto najmniejszą liczbę kolumn")
+        makeToast("Osiągnięto najmniejszą liczbę kolumn")
     },
     [columns, content.wordOfDay]
   )
@@ -88,7 +75,7 @@ const Game: React.FC = () => {
     () => {
       setRows((prevState) => ( prevState + 1
       ));
-      makeToansify("Dodano nową próbę")
+      makeToast("Dodano nową próbę")
     },
     []
   )
@@ -233,7 +220,6 @@ const Game: React.FC = () => {
         handleEnter={handleEnter}
         gameState={gameState}
       />
-      <ToastContainer />
 
       {showQuestion && (
         <Question
