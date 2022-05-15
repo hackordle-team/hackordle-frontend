@@ -20,6 +20,7 @@ const HackButton: React.FC<HackbarProps> = ({
     callbackMethod(hackFunction);
     questionFunction();
   };
+  const path = "/assets/" + image
   return (
     <div>
       <button
@@ -27,7 +28,7 @@ const HackButton: React.FC<HackbarProps> = ({
         onClick={execute}
         key={hackName}
       >
-        <img src="/assets/add_row.svg" alt={hackName}></img>
+        <img src={path} alt={hackName}></img>
       </button>
       <ToastContainer />
     </div>
