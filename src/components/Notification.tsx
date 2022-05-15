@@ -39,7 +39,7 @@ const Notification: React.FC<NotificationProps> = ({title, msg, open, handleClos
                     <p className={"font-bold"}>{msg}</p>
                 </Typography>
                 <Typography id="modal-notification-description" sx={{ mt: 2 }}>
-                    <p className={"font-bold"}>Słowo dnia: {wordOfDay}</p>
+                    <p className={"font-bold"}>{wordOfDay}</p>
                 </Typography>
                 <br></br>
                 {children}
