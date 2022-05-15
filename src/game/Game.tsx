@@ -29,12 +29,15 @@ enum GameStatus {
 }
 
 interface GameProps {
-  isMulti: boolean,
+  isMulti: boolean;
   onUpdate?: (val: GameState) => void;
+  waiting?: boolean;
+  onWin?: () => void;
 }
 
-const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
+const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
   const content = useContext(GameContendContext);
+  console.log(waiting);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
   const [columns, setColumns] = useState(DEFAULT_COLUMNS);
@@ -121,7 +124,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
       });
     });
     setColors(innerColors);
-    console.log(colors);
+    //console.log(colors);
   }, [gameState, setColors]);
   const handleGetWordLength = useCallback(() => {
     const wordLn = innerInput.length;
@@ -140,7 +143,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
     }
     if (!content.dictionary?.includes(innerInput.toLowerCase())) {
       setEnter(false);
-      makeToast("Hasła nie ma w słowniku")
+      makeToast("Hasła nie ma w słowniku");
       return;
     }
     const lettersColored: GameElementType[] = innerInput
@@ -182,6 +185,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
       lastRow.length === content.wordOfDay?.length
     ) {
       setGameStatus(GameStatus.WON);
+      onWin?.();
       return;
     }
 
@@ -192,8 +196,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
   }, [gameState]);
 
   useEffect(() => {
-    if(isMulti)
-      return;
+    if (isMulti) return;
 
     const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
     console.log(`retrieve gameState ${retrievedGameState}`);
@@ -208,8 +211,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
   }, []);
 
   useEffect(() => {
-    if(isMulti)
-      return;
+    if (isMulti) return;
 
     if (
       gameState.rowsNumber > 0 ||
@@ -287,7 +289,12 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
         ]}
         questionFunction={() => setShowQuestion(true)}
         callbackMethod={handleHackMethod}
-        images={["remove_col.png", "add_row.png", "check_length.png", "remove_letter.png"]}
+        images={[
+          "remove_col.png",
+          "add_row.png",
+          "check_length.png",
+          "remove_letter.png",
+        ]}
       />
       <Keyboard
         handleBackspace={handleBackspace}
