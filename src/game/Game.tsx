@@ -4,21 +4,21 @@ import Keyboard from "./Keyboard";
 import Hackbar from "./Hackbar";
 import { ColorType, GameElementType, GameState } from "../const/types";
 import { GameContendContext } from "../App";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 import Notification from "../components/Notification";
 import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
-import {makeToast} from "../components/Toast";
+import { makeToast } from "../components/Toast";
 
 const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
 const DEFAULT_COLUMNS = 8;
 const DEFAULT_ROWS = 6;
 
 interface DailyGameState {
-  gameState: GameState,
-  date: string,
-  rows: number,
-  columns: number
+  gameState: GameState;
+  date: string;
+  rows: number;
+  columns: number;
 }
 
 enum GameStatus {
@@ -40,11 +40,13 @@ const Game: React.FC = () => {
   const [gameStatus, setGameStatus] = useState(GameStatus.IN_PROGRESS);
   const [enter, setEnter] = useState(false);
   const [showQuestion, setShowQuestion] = useState(false);
-  const defFunc = () => {console.log("init")};
-  const [currentHack, setCurrentHack] = useState(() => defFunc); 
+  const defFunc = () => {
+    console.log("init");
+  };
+  const [currentHack, setCurrentHack] = useState(() => defFunc);
 
   const handleHackMethod = useCallback((func: () => void) => {
-    setCurrentHack((prevState) => func);
+    setCurrentHack(() => func);
   }, []);
 
   const handleBackspace = useCallback(() => {
@@ -59,26 +61,18 @@ const Game: React.FC = () => {
     },
     [columns]
   );
-  
-  const handleDeleteColumn = useCallback(
-    () => {
-      if (content.wordOfDay && content.wordOfDay.length < columns) {
-        setColumns((prevState) => prevState - 1)
-        makeToast("Udało się usunąć kolumnę")
-      } else
-        makeToast("Osiągnięto najmniejszą liczbę kolumn")
-    },
-    [columns, content.wordOfDay]
-  )
 
-  const handleAddRow = useCallback(
-    () => {
-      setRows((prevState) => ( prevState + 1
-      ));
-      makeToast("Dodano nową próbę")
-    },
-    []
-  )
+  const handleDeleteColumn = useCallback(() => {
+    if (content.wordOfDay && content.wordOfDay.length < columns) {
+      setColumns((prevState) => prevState - 1);
+      makeToast("Udało się usunąć kolumnę");
+    } else makeToast("Osiągnięto najmniejszą liczbę kolumn");
+  }, [columns, content.wordOfDay]);
+
+  const handleAddRow = useCallback(() => {
+    setRows((prevState) => prevState + 1);
+    makeToast("Dodano nową próbę");
+  }, []);
 
   useEffect(() => {
     if (!enter) {
@@ -139,36 +133,40 @@ const Game: React.FC = () => {
   useEffect(() => {
     const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
     console.log(`retrieve gameState ${retrievedGameState}`);
-    if(retrievedGameState){
+    if (retrievedGameState) {
       const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
-      if(dailyGameState.date === new Date().toISOString().slice(0, 10)){
+      if (dailyGameState.date === new Date().toISOString().slice(0, 10)) {
         setGameState(dailyGameState.gameState);
         setRows(dailyGameState.rows);
         setColumns(dailyGameState.columns);
       }
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    if(gameState.rowsNumber > 0 || rows > DEFAULT_ROWS || columns < DEFAULT_COLUMNS){
+    if (
+      gameState.rowsNumber > 0 ||
+      rows > DEFAULT_ROWS ||
+      columns < DEFAULT_COLUMNS
+    ) {
       const dailyGameState: DailyGameState = {
         gameState: gameState,
         date: new Date().toISOString().slice(0, 10),
         rows: rows,
-        columns: columns
+        columns: columns,
       };
       const gameStateString = JSON.stringify(dailyGameState);
       console.log(`save gameState`);
       localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
     }
-  }, [gameState, rows, columns])
+  }, [gameState, rows, columns]);
 
   const handleEnter = () => {
     setEnter(true);
   };
 
   const handleGameFinish = () => {
-    navigate('/')
+    navigate("/");
   };
 
   const [notificationTitle, notificationMsg] = (() => {
@@ -211,8 +209,8 @@ const Game: React.FC = () => {
           handleDeleteColumn,
           handleDeleteColumn,
         ]}
-        questionFunction = {() => setShowQuestion(true)}
-        callbackMethod = {handleHackMethod}
+        questionFunction={() => setShowQuestion(true)}
+        callbackMethod={handleHackMethod}
       />
       <Keyboard
         handleBackspace={handleBackspace}
@@ -225,15 +223,13 @@ const Game: React.FC = () => {
         <Question
           question={content.questions?.[0]}
           hackName={"hack"}
-          onResult={
-            (correctAnswer) => {
-              setShowQuestion(false)
-              if (correctAnswer) {
-                console.log("GOOD ONE")
-                currentHack();
-              }
+          onResult={(correctAnswer) => {
+            setShowQuestion(false);
+            if (correctAnswer) {
+              console.log("GOOD ONE");
+              currentHack();
             }
-          }
+          }}
         />
       )}
     </div>

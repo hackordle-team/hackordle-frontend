@@ -16,7 +16,7 @@ const getGameRow = (
   innerState: string
 ) => {
   let letters: JSX.Element[] = [];
-  let blanksNumber: number = cols
+  let blanksNumber: number = cols;
 
   if (row < gameState.rowsNumber) {
     letters = gameState.rows?.[row].elements.map((boardElement, i) => (
@@ -63,7 +63,7 @@ const Board: React.FC<BoardProps> = ({ cols, rows, gameState, innerState }) => {
 
   return (
     <div className="flex flex-col space-y-2 justify-center">
-      {generatedRows.map((el, id) => el)}
+      {generatedRows.map((el) => el)}
     </div>
   );
 };

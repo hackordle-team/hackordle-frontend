@@ -93,7 +93,7 @@ const BlurredBoard: React.FC<BlurredBoardProps> = ({
 
   return (
     <div className="flex flex-col space-y-2 justify-center w-full">
-      {generatedRows.map((el, id) => el)}
+      {generatedRows.map((el) => el)}
     </div>
   );
 };
