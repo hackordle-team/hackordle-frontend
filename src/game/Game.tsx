@@ -11,16 +11,16 @@ import Question from "../components/Question";
 import { makeToast } from "../components/Toast";
 import { LETTER } from "../const/const";
 
-const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
+// const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
 const DEFAULT_COLUMNS = 8;
 const DEFAULT_ROWS = 6;
 
-interface DailyGameState {
-  gameState: GameState;
-  date: string;
-  rows: number;
-  columns: number;
-}
+// interface DailyGameState {
+//   gameState: GameState;
+//   date: string;
+//   rows: number;
+//   columns: number;
+// }
 
 enum GameStatus {
   IN_PROGRESS,
@@ -75,7 +75,9 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
 
   const handleDeleteColumn = useCallback(() => {
     if (content.wordOfDay && content.wordOfDay.length < columns) {
-      setInnerInput((prevState) => prevState.slice(0, Math.min(columns-1, prevState.length)))
+      setInnerInput((prevState) =>
+        prevState.slice(0, Math.min(columns - 1, prevState.length))
+      );
       setColumns((prevState) => prevState - 1);
       makeToast("Udało się usunąć kolumnę");
     } else makeToast("Osiągnięto najmniejszą liczbę kolumn");
@@ -127,8 +129,7 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
         makeToast("Twoje słowo jest dłuższe");
       else if (wordLn == content.wordOfDay.length)
         makeToast("Twoje słowo i słowo dnia są tej samej długości");
-      else
-        makeToast("Twoje słowo jest krótsze");
+      else makeToast("Twoje słowo jest krótsze");
     }
   }, [innerInput, content.wordOfDay]);
 
@@ -207,12 +208,12 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
       rows > DEFAULT_ROWS ||
       columns < DEFAULT_COLUMNS
     ) {
-      const dailyGameState: DailyGameState = {
-        gameState: gameState,
-        date: new Date().toISOString().slice(0, 10),
-        rows: rows,
-        columns: columns,
-      };
+      // const dailyGameState: DailyGameState = {
+      //   gameState: gameState,
+      //   date: new Date().toISOString().slice(0, 10),
+      //   rows: rows,
+      //   columns: columns,
+      // };
       // const gameStateString = JSON.stringify(dailyGameState);
       //console.log(`save gameState`);
       //localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
@@ -229,9 +230,17 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
 
   const [notificationTitle, notificationMsg, notificationWordOfDay] = (() => {
     if (gameStatus == GameStatus.WON)
-      return ["Wygrałeś", "Gratulacje! Udało ci się odgadnąć słowo.", content.wordOfDay];
+      return [
+        "Wygrałeś",
+        "Gratulacje! Udało ci się odgadnąć słowo.",
+        content.wordOfDay,
+      ];
     else if (gameStatus == GameStatus.LOST)
-      return ["Przegrałeś", "Niestety nie udało si się odgadnąć słowa.", content.wordOfDay];
+      return [
+        "Przegrałeś",
+        "Niestety nie udało si się odgadnąć słowa.",
+        content.wordOfDay,
+      ];
     else return ["", ""];
   })();
 
@@ -282,16 +291,11 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
         <Question
           question={content.questions?.[0]}
           hackName={"hack"}
-          onResult={
-            (correctAnswer) => {
-              setShowQuestion(false)
-              if (correctAnswer)
-                currentHack();
-               else 
-                setGameStatus(GameStatus.LOST);
-            }
-            
-          }
+          onResult={(correctAnswer) => {
+            setShowQuestion(false);
+            if (correctAnswer) currentHack();
+            else setGameStatus(GameStatus.LOST);
+          }}
         />
       )}
     </div>
