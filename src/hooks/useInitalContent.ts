@@ -1,6 +1,6 @@
 import { QuestionType } from "../const/types";
 
-const SERVER_URL = "https://hackordle.herokuapp.com";
+const SERVER_URL = "https://wolk-arkadiusz.xyz";
 
 type UseInitialContentProps = {
   onWordOfDayLoad: (word: string) => void;
@@ -19,6 +19,8 @@ const useInitialContent = ({
       fetch(`${SERVER_URL}/dictionary`).then((res) => res.json()),
       fetch(`${SERVER_URL}/quizzes`).then((res) => res.json()),
     ]);
+
+    console.log(data)
 
     onWordOfDayLoad(data[0].word_otd);
     onDictionaryLoad(data[1].dictionary);
