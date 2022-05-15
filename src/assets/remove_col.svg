@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 50 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(0.884185,0,0,0.884185,-623.335,-630.526)">
+        <g transform="matrix(1.30867,0,0,1.30867,-213.071,-224.134)">
+            <circle cx="711.888" cy="720.938" r="4.716" style="fill:white;"/>
+        </g>
+        <g transform="matrix(1.30867,0,0,1.30867,-198.371,-224.134)">
+            <circle cx="711.888" cy="720.938" r="4.716" style="fill:white;"/>
+        </g>
+        <g transform="matrix(8.01331e-17,1.30867,-1.30867,8.01331e-17,1676.73,-197.591)">
+            <circle cx="711.888" cy="720.938" r="4.716" style="fill:white;"/>
+        </g>
+        <g transform="matrix(8.01331e-17,1.30867,-1.30867,8.01331e-17,1662.03,-197.591)">
+            <circle cx="711.888" cy="720.938" r="4.716" style="fill:white;"/>
+        </g>
+        <g transform="matrix(1.30867,0,0,1.30867,-213.071,-224.134)">
+            <path d="M734.354,716.222C736.957,716.222 739.07,718.335 739.07,720.938C739.07,723.541 736.957,725.654 734.354,725.654C731.751,725.654 729.638,723.541 729.638,720.938C729.638,718.335 731.751,716.222 734.354,716.222ZM736.982,719.975L731.726,719.975L731.726,721.902L736.982,721.902L736.982,719.975Z" style="fill:rgb(249,96,96);"/>
+        </g>
+        <g transform="matrix(1.30867,0,0,1.30867,-213.071,-224.134)">
+            <path d="M739.07,732.171C739.07,734.774 736.957,736.887 734.354,736.887C731.751,736.887 729.638,734.774 729.638,732.171C729.638,729.568 731.751,727.455 734.354,727.455C736.957,727.455 739.07,729.568 739.07,732.171ZM736.982,731.208L731.726,731.208L731.726,733.134L736.982,733.134L736.982,731.208Z" style="fill:rgb(249,96,96);"/>
+        </g>
+    </g>
+</svg>
