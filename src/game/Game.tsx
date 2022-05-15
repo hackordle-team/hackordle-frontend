@@ -76,7 +76,9 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
 
   const handleDeleteColumn = useCallback(() => {
     if (content.wordOfDay && content.wordOfDay.length < columns) {
-      setInnerInput((prevState) => prevState.slice(0, Math.min(columns-1, prevState.length)))
+      setInnerInput((prevState) =>
+        prevState.slice(0, Math.min(columns - 1, prevState.length))
+      );
       setColumns((prevState) => prevState - 1);
       makeToast("Udało się usunąć kolumnę");
     } else makeToast("Osiągnięto najmniejszą liczbę kolumn");
@@ -128,8 +130,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
         makeToast("Twoje słowo jest dłuższe");
       else if (wordLn == content.wordOfDay.length)
         makeToast("Twoje słowo i słowo dnia są tej samej długości");
-      else
-        makeToast("Twoje słowo jest krótsze");
+      else makeToast("Twoje słowo jest krótsze");
     }
   }, [innerInput, content.wordOfDay]);
 
@@ -236,9 +237,17 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
 
   const [notificationTitle, notificationMsg, notificationWordOfDay] = (() => {
     if (gameStatus == GameStatus.WON)
-      return ["Wygrałeś", "Gratulacje! Udało ci się odgadnąć słowo.", content.wordOfDay];
+      return [
+        "Wygrałeś",
+        "Gratulacje! Udało ci się odgadnąć słowo.",
+        content.wordOfDay,
+      ];
     else if (gameStatus == GameStatus.LOST)
-      return ["Przegrałeś", "Niestety nie udało si się odgadnąć słowa.", content.wordOfDay];
+      return [
+        "Przegrałeś",
+        "Niestety nie udało si się odgadnąć słowa.",
+        content.wordOfDay,
+      ];
     else return ["", ""];
   })();
 
@@ -289,16 +298,11 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
         <Question
           question={content.questions?.[0]}
           hackName={"hack"}
-          onResult={
-            (correctAnswer) => {
-              setShowQuestion(false)
-              if (correctAnswer)
-                currentHack();
-               else 
-                setGameStatus(GameStatus.LOST);
-            }
-            
-          }
+          onResult={(correctAnswer) => {
+            setShowQuestion(false);
+            if (correctAnswer) currentHack();
+            else setGameStatus(GameStatus.LOST);
+          }}
         />
       )}
     </div>
