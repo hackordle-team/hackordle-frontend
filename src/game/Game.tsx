@@ -64,15 +64,28 @@ const Game: React.FC = () => {
 
   const handleDeleteColumn = useCallback(() => {
     if (content.wordOfDay && content.wordOfDay.length < columns) {
+      setInnerInput((prevState) => prevState.slice(0, Math.min(columns-1, prevState.length)))
       setColumns((prevState) => prevState - 1);
       makeToast("Udało się usunąć kolumnę");
     } else makeToast("Osiągnięto najmniejszą liczbę kolumn");
-  }, [columns, content.wordOfDay]);
+  }, [columns, content.wordOfDay, innerInput]);
 
   const handleAddRow = useCallback(() => {
     setRows((prevState) => prevState + 1);
     makeToast("Dodano nową próbę");
   }, []);
+
+  const handleGetWordLength = useCallback(() => {
+    const wordLn = innerInput.length;
+    if (content.wordOfDay) {
+      if (wordLn > content.wordOfDay.length)
+        makeToast("Twoje słowo jest dłuższe");
+      else if (wordLn == content.wordOfDay.length)
+        makeToast("Twoje słowo i słowo dnia są tej samej długości");
+      else
+        makeToast("Twoje słowo jest krótsze");
+    }
+  }, [innerInput, content.wordOfDay]);
 
   useEffect(() => {
     if (!enter) {
@@ -206,8 +219,7 @@ const Game: React.FC = () => {
         hackFunctions={[
           handleDeleteColumn,
           handleAddRow,
-          handleDeleteColumn,
-
+          handleGetWordLength,
           handleDeleteColumn,
         ]}
         questionFunction={() => setShowQuestion(true)}
@@ -224,13 +236,16 @@ const Game: React.FC = () => {
         <Question
           question={content.questions?.[0]}
           hackName={"hack"}
-          onResult={(correctAnswer) => {
-            setShowQuestion(false);
-            if (correctAnswer) {
-              console.log("GOOD ONE");
-              currentHack();
+          onResult={
+            (correctAnswer) => {
+              setShowQuestion(false)
+              if (correctAnswer)
+                currentHack();
+               else 
+                setGameStatus(GameStatus.LOST);
             }
-          }}
+            
+          }
         />
       )}
     </div>
