@@ -11,10 +11,14 @@ import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
 
 const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
+const DEFAULT_COLUMNS = 8;
+const DEFAULT_ROWS = 6;
 
 interface DailyGameState {
   gameState: GameState,
-  date: string
+  date: string,
+  rows: number,
+  columns: number
 }
 
 enum GameStatus {
@@ -40,8 +44,8 @@ const Game: React.FC = () => {
   const content = useContext(GameContendContext);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
-  const [columns, setColumns] = useState(8);
-  const [rows, setRows] = useState(6);
+  const [columns, setColumns] = useState(DEFAULT_COLUMNS);
+  const [rows, setRows] = useState(DEFAULT_ROWS);
   const [gameState, setGameState] = useState<GameState>({
     rowsNumber: 0,
     rows: [],
@@ -150,22 +154,27 @@ const Game: React.FC = () => {
     console.log(`retrieve gameState ${retrievedGameState}`);
     if(retrievedGameState){
       const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
-      if(dailyGameState.date === new Date().toISOString().slice(0, 10))
+      if(dailyGameState.date === new Date().toISOString().slice(0, 10)){
         setGameState(dailyGameState.gameState);
+        setRows(dailyGameState.rows);
+        setColumns(dailyGameState.columns);
+      }
     }
   }, [])
 
   useEffect(() => {
-    if(gameState.rowsNumber > 0){
+    if(gameState.rowsNumber > 0 || rows > DEFAULT_ROWS || columns < DEFAULT_COLUMNS){
       const dailyGameState: DailyGameState = {
         gameState: gameState,
-        date: new Date().toISOString().slice(0, 10)
+        date: new Date().toISOString().slice(0, 10),
+        rows: rows,
+        columns: columns
       };
       const gameStateString = JSON.stringify(dailyGameState);
       console.log(`save gameState`);
       localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
     }
-  }, [gameState])
+  }, [gameState, rows, columns])
 
   const handleEnter = () => {
     setEnter(true);
