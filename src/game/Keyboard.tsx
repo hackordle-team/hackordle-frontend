@@ -40,7 +40,7 @@ const Keyboard: React.FC<KeyboardProps> = ({
         handleEnter();
       } else if (event.key === "Backspace") {
         handleBackspace();
-      } else {
+      } else if (event.key.length === 1 && (event.key.match(/[a-z]/i) || event.key.match(/[A-Z]/i))){
         handleLetter(event.key.toUpperCase());
       }
     };
@@ -54,7 +54,7 @@ const Keyboard: React.FC<KeyboardProps> = ({
       handleBackspace();
     } else if (val === "ENTER") {
       handleEnter();
-    } else {
+    } else if (val.length === 1 && (val.match(/[a-z]/i) || val.match(/[A-Z]/i))){
       handleLetter(val);
     }
   };
