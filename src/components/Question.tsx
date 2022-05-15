@@ -102,9 +102,9 @@ const Question: React.FC<QuestionProps> = ({
           );
           setTimeout(
             () => onResult(question?.answers[answerIdx].correct ?? false),
-            2000
+            1000
           );
-        }, 3000);
+        }, 1500);
       }
     };
   };
