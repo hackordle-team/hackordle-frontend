@@ -1,12 +1,15 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import Board from "./Board";
 import Keyboard from "./Keyboard";
 import Hackbar from "./Hackbar";
 import { ColorType, GameElementType, GameState } from "../const/types";
 import { GameContendContext } from "../App";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Notification from "../components/Notification";
 import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
+import { cursorTo } from "readline";
 
 enum GameStatus {
   IN_PROGRESS,
@@ -15,10 +18,24 @@ enum GameStatus {
 }
 
 const Game: React.FC = () => {
+
+  function makeToansify(message: string) {
+    toast.info(message, {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      });
+  }
+
   const content = useContext(GameContendContext);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
-  const [columns, setColumns] = useState(10);
+  const [columns, setColumns] = useState(8);
+  const [rows, setRows] = useState(6);
   const [maxRows, setMaxRows] = useState(8); //maksymalna liczba prób
   const [gameState, setGameState] = useState<GameState>({
     rowsNumber: 0,
@@ -27,6 +44,12 @@ const Game: React.FC = () => {
   const [gameStatus, setGameStatus] = useState(GameStatus.IN_PROGRESS);
   const [enter, setEnter] = useState(false);
   const [showQuestion, setShowQuestion] = useState(false);
+  const defFunc = () => {console.log("init")};
+  const [currentHack, setCurrentHack] = useState(() => defFunc); 
+
+  const handleHackMethod = useCallback((func: () => void) => {
+    setCurrentHack((prevState) => func);
+  }, []);
 
   const handleBackspace = useCallback(() => {
     setInnerInput((prevState) => prevState.slice(0, -1));
@@ -40,6 +63,26 @@ const Game: React.FC = () => {
     },
     [columns]
   );
+  
+  const handleDeleteColumn = useCallback(
+    () => {
+      if (content.wordOfDay && content.wordOfDay.length < columns) {
+        setColumns((prevState) => prevState - 1)
+        makeToansify("Udało się usunąć kolumnę")
+      } else
+        makeToansify("Osiągnięto najmniejszą liczbę kolumn")
+    },
+    [columns, content.wordOfDay]
+  )
+
+  const handleAddRow = useCallback(
+    () => {
+      setRows((prevState) => ( prevState + 1
+      ));
+      makeToansify("Dodano nową próbę")
+    },
+    []
+  )
 
   useEffect(() => {
     if (!enter) {
@@ -135,18 +178,20 @@ const Game: React.FC = () => {
       </Notification>
       <Board
         cols={columns}
-        rows={8}
+        rows={rows}
         gameState={gameState}
         innerState={innerInput}
       />
       <Hackbar
         hackNames={["HACK 1", "HACK 2", "HACK 3", "HACK 4"]}
         hackFunctions={[
-          () => setShowQuestion(true),
-          () => setShowQuestion(true),
-          () => setShowQuestion(true),
-          () => setShowQuestion(true),
+          handleDeleteColumn,
+          handleAddRow,
+          handleDeleteColumn,
+          handleDeleteColumn,
         ]}
+        questionFunction = {() => setShowQuestion(true)}
+        callbackMethod = {handleHackMethod}
       />
       <Keyboard
         handleBackspace={handleBackspace}
@@ -154,11 +199,21 @@ const Game: React.FC = () => {
         handleEnter={handleEnter}
         gameState={gameState}
       />
+      <ToastContainer />
+
       {showQuestion && (
         <Question
           question={content.questions?.[0]}
           hackName={"hack"}
-          onResult={() => setShowQuestion(false)}
+          onResult={
+            (correctAnswer) => {
+              setShowQuestion(false)
+              if (correctAnswer)
+                console.log("GOOD ONE")
+                currentHack();
+              }
+            
+          }
         />
       )}
     </div>

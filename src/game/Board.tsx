@@ -16,7 +16,7 @@ const getGameRow = (
   innerState: string
 ) => {
   let letters: JSX.Element[] = [];
-  let blanksNumber: number = cols;
+  let blanksNumber: number = cols
 
   if (row < gameState.rowsNumber) {
     letters = gameState.rows?.[row].elements.map((boardElement, i) => (
