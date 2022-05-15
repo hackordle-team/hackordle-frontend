@@ -14,6 +14,7 @@ const Multiplayer: React.FC<{
   const webSocket = useRef<WebSocket>();
   const [waiting, setWaiting] = useState(true);
   const [lost, setLost] = useState(false);
+  const [word, setWord] = useState("");
 
   const [opponentState, setOpponentState] = useState<GameState>({
     rowsNumber: 0,
@@ -34,6 +35,7 @@ const Multiplayer: React.FC<{
       if (d?.type == "start") {
         setWaiting(false);
         onWordChange(d?.word);
+        setWord(d?.word);
       }
       if (d?.status == "win") {
         setLost(true);
@@ -52,7 +54,7 @@ const Multiplayer: React.FC<{
   //console.log("message: ", messages);
   const [notificationTitle, notificationMsg, notificationWordOfDay] = (() => {
     if (lost)
-      return ["Przegrałeś", "Niestety nie udało si się odgadnąć słowa."];
+      return ["Przegrałeś", "Niestety nie udało si się odgadnąć słowa.", word];
     else return ["", "", ""];
   })();
 
