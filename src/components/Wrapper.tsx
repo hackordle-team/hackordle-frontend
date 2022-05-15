@@ -15,7 +15,7 @@ const Wrapper: React.FC<WrapperProps> = ({
   return (
     <div
       className={clsx(
-        "w-full h-full bg-gray-800",
+        "w-full h-full bg-gray-900",
         !disablePadding && "p-8",
         center && "m-auto"
       )}
