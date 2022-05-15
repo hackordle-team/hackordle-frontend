@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Notification from "./Notification";
+import {makeToast} from "./Toast";
 
 export type AnswerType = {
   content: string;
@@ -65,11 +66,9 @@ const Question: React.FC<QuestionProps> = ({
     if (answerStatus === AnswerStatus.ANSWER_RESULT) {
       setOpen(false);
     } else if (answerStatus === AnswerStatus.WAITING_FOR_RESULT) {
-      //TODO: toast
-      console.log("Poczekaj na rezultat");
+      makeToast("Poczekaj na rezultat");
     } else {
-      //TODO: toast
-      console.log("Odpowiedz na pytanie");
+      makeToast("Odpowiedz na pytanie");
     }
   };
 

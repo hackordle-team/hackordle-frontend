@@ -16,7 +16,7 @@ const getGameRow = (
   innerState: string
 ) => {
   let letters: JSX.Element[] = [];
-  let blanksNumber: number = cols
+  let blanksNumber: number = cols;
 
   if (row < gameState.rowsNumber) {
     letters = gameState.rows?.[row].elements.map((boardElement, i) => (
@@ -47,7 +47,7 @@ const getGameRows = (
   innerState: string
 ) => {
   return [...new Array(rows)].map((row, i) => (
-    <div key={`key-${i}`} className="m-auto flex space-x-3">
+    <div key={`key-${i}`} className="m-auto flex space-x-2">
       {getGameRow(cols, gameState, i, innerState).map((el, id) => (
         <div key={id}>{el}</div>
       ))}
@@ -62,8 +62,8 @@ const Board: React.FC<BoardProps> = ({ cols, rows, gameState, innerState }) => {
   );
 
   return (
-    <div className="flex flex-col space-y-3 justify-center">
-      {generatedRows.map((el, id) => el)}
+    <div className="flex flex-col space-y-2 justify-center">
+      {generatedRows.map((el) => el)}
     </div>
   );
 };

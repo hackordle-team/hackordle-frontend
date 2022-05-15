@@ -1,15 +1,25 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import Board from "./Board";
 import Keyboard from "./Keyboard";
 import Hackbar from "./Hackbar";
 import { ColorType, GameElementType, GameState } from "../const/types";
 import { GameContendContext } from "../App";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 import Notification from "../components/Notification";
 import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
-import { cursorTo } from "readline";
+import { makeToast } from "../components/Toast";
+
+const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
+const DEFAULT_COLUMNS = 8;
+const DEFAULT_ROWS = 6;
+
+interface DailyGameState {
+  gameState: GameState;
+  date: string;
+  rows: number;
+  columns: number;
+}
 
 enum GameStatus {
   IN_PROGRESS,
@@ -18,25 +28,11 @@ enum GameStatus {
 }
 
 const Game: React.FC = () => {
-
-  function makeToansify(message: string) {
-    toast.info(message, {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      progress: undefined,
-      });
-  }
-
   const content = useContext(GameContendContext);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
-  const [columns, setColumns] = useState(8);
-  const [rows, setRows] = useState(6);
-  const [maxRows, setMaxRows] = useState(8); //maksymalna liczba prób
+  const [columns, setColumns] = useState(DEFAULT_COLUMNS);
+  const [rows, setRows] = useState(DEFAULT_ROWS);
   const [gameState, setGameState] = useState<GameState>({
     rowsNumber: 0,
     rows: [],
@@ -44,12 +40,13 @@ const Game: React.FC = () => {
   const [gameStatus, setGameStatus] = useState(GameStatus.IN_PROGRESS);
   const [enter, setEnter] = useState(false);
   const [showQuestion, setShowQuestion] = useState(false);
-  const defFunc = () => {console.log("init")};
-  const [currentHack, setCurrentHack] = useState(() => defFunc); 
-  const columnRef = useRef(columns);
+  const defFunc = () => {
+    console.log("init");
+  };
+  const [currentHack, setCurrentHack] = useState(() => defFunc);
 
   const handleHackMethod = useCallback((func: () => void) => {
-    setCurrentHack((prevState) => func);
+    setCurrentHack(() => func);
   }, []);
 
   const handleBackspace = useCallback(() => {
@@ -64,25 +61,19 @@ const Game: React.FC = () => {
     },
     [columns]
   );
-  
-  const handleDeleteColumn = useCallback(
-    () => {
-      if (content.wordOfDay && content.wordOfDay.length < columns) {
-        setColumns((prevState) => prevState - 1)
-        makeToansify("Udało się usunąć kolumnę")
-      } else
-        makeToansify("Osiągnięto najmniejszą liczbę kolumn")
-    },
-    [columns, content.wordOfDay]
-  )
 
-  const handleAddRow = useCallback(
-    () => {
-      setRows((prevState) => ( prevState + 1));
-      makeToansify("Dodano nową próbę")
-    },
-    []
-  )
+  const handleDeleteColumn = useCallback(() => {
+    if (content.wordOfDay && content.wordOfDay.length < columns) {
+      setInnerInput((prevState) => prevState.slice(0, Math.min(columns-1, prevState.length)))
+      setColumns((prevState) => prevState - 1);
+      makeToast("Udało się usunąć kolumnę");
+    } else makeToast("Osiągnięto najmniejszą liczbę kolumn");
+  }, [columns, content.wordOfDay, innerInput]);
+
+  const handleAddRow = useCallback(() => {
+    setRows((prevState) => prevState + 1);
+    makeToast("Dodano nową próbę");
+  }, []);
 
   useEffect(() => {
     if (!enter) {
@@ -134,19 +125,48 @@ const Game: React.FC = () => {
       return;
     }
 
-    if (maxRows === gameState.rowsNumber) {
+    if (rows === gameState.rowsNumber) {
       setGameStatus(GameStatus.LOST);
       return;
     }
   }, [gameState]);
 
+  useEffect(() => {
+    const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
+    console.log(`retrieve gameState ${retrievedGameState}`);
+    if (retrievedGameState) {
+      const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
+      if (dailyGameState.date === new Date().toISOString().slice(0, 10)) {
+        setGameState(dailyGameState.gameState);
+        setRows(dailyGameState.rows);
+        setColumns(dailyGameState.columns);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (
+      gameState.rowsNumber > 0 ||
+      rows > DEFAULT_ROWS ||
+      columns < DEFAULT_COLUMNS
+    ) {
+      const dailyGameState: DailyGameState = {
+        gameState: gameState,
+        date: new Date().toISOString().slice(0, 10),
+        rows: rows,
+        columns: columns,
+      };
+      const gameStateString = JSON.stringify(dailyGameState);
+      console.log(`save gameState`);
+      localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
+    }
+  }, [gameState, rows, columns]);
+
   const handleEnter = () => {
     setEnter(true);
-    //console.log("Enter pressed");
   };
 
   const handleGameFinish = () => {
-    //TODO: go to main menu
     navigate("/");
   };
 
@@ -190,8 +210,8 @@ const Game: React.FC = () => {
           handleDeleteColumn,
           handleDeleteColumn,
         ]}
-        questionFunction = {() => setShowQuestion(true)}
-        callbackMethod = {handleHackMethod}
+        questionFunction={() => setShowQuestion(true)}
+        callbackMethod={handleHackMethod}
       />
       <Keyboard
         handleBackspace={handleBackspace}
@@ -199,7 +219,6 @@ const Game: React.FC = () => {
         handleEnter={handleEnter}
         gameState={gameState}
       />
-      <ToastContainer />
 
       {showQuestion && (
         <Question
