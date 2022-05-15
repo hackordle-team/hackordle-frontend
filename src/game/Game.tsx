@@ -27,7 +27,11 @@ enum GameStatus {
   LOST,
 }
 
-const Game: React.FC = () => {
+interface GameProps {
+  onUpdate?: (val: GameState) => void;
+}
+
+const Game: React.FC<GameProps> = ({ onUpdate }) => {
   const content = useContext(GameContendContext);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
@@ -44,6 +48,8 @@ const Game: React.FC = () => {
     console.log("init");
   };
   const [currentHack, setCurrentHack] = useState(() => defFunc);
+
+  useEffect(() => onUpdate?.(gameState), [gameState]);
 
   const handleHackMethod = useCallback((func: () => void) => {
     setCurrentHack(() => func);
@@ -130,18 +136,18 @@ const Game: React.FC = () => {
     }
   }, [gameState]);
 
-  useEffect(() => {
-    const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
-    console.log(`retrieve gameState ${retrievedGameState}`);
-    if (retrievedGameState) {
-      const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
-      if (dailyGameState.date === new Date().toISOString().slice(0, 10)) {
-        setGameState(dailyGameState.gameState);
-        setRows(dailyGameState.rows);
-        setColumns(dailyGameState.columns);
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
+  //   console.log(`retrieve gameState ${retrievedGameState}`);
+  //   if (retrievedGameState) {
+  //     const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
+  //     if (dailyGameState.date === new Date().toISOString().slice(0, 10)) {
+  //       setGameState(dailyGameState.gameState);
+  //       setRows(dailyGameState.rows);
+  //       setColumns(dailyGameState.columns);
+  //     }
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (
@@ -155,9 +161,9 @@ const Game: React.FC = () => {
         rows: rows,
         columns: columns,
       };
-      const gameStateString = JSON.stringify(dailyGameState);
-      console.log(`save gameState`);
-      localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
+      // const gameStateString = JSON.stringify(dailyGameState);
+      //console.log(`save gameState`);
+      //localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
     }
   }, [gameState, rows, columns]);
 
