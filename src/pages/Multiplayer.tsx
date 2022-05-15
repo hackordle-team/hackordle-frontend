@@ -102,6 +102,7 @@ const Multiplayer: React.FC<{
 
             <div className="w-3/5">
               <Game
+                word={word}
                 isMulti={true}
                 onWin={() => {
                   const obj = {

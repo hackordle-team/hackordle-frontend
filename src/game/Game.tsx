@@ -30,12 +30,13 @@ interface DailyGameState {
 }
 
 interface GameProps {
+  word: string,
   isMulti: boolean;
   onUpdate?: (val: GameState) => void;
   onWin?: () => void;
 }
 
-const Game: React.FC<GameProps> = ({ isMulti, onUpdate, onWin }) => {
+const Game: React.FC<GameProps> = ({word, isMulti, onUpdate, onWin }) => {
   const content = useContext(GameContendContext);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
@@ -79,14 +80,14 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, onWin }) => {
   );
 
   const handleDeleteColumn = useCallback(() => {
-    if (content.wordOfDay && content.wordOfDay.length < columns) {
+    if (word && word.length < columns) {
       setInnerInput((prevState) =>
         prevState.slice(0, Math.min(columns - 1, prevState.length))
       );
       setColumns((prevState) => prevState - 1);
       makeToast("Udało się usunąć kolumnę");
     } else makeToast("Osiągnięto najmniejszą liczbę kolumn");
-  }, [columns, content.wordOfDay, innerInput]);
+  }, [columns, word, innerInput]);
 
   const handleAddRow = useCallback(() => {
     setRows((prevState) => prevState + 1);
@@ -100,7 +101,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, onWin }) => {
     LETTER.sort(() => 0.5 - Math.random()).map((el) => {
       if (
         count === 0 &&
-        !content.wordOfDay?.toUpperCase().includes(el) &&
+        !word?.toUpperCase().includes(el) &&
         innerColors[el] === "GRAY"
       ) {
         count += 1;
@@ -114,7 +115,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, onWin }) => {
     } else {
       makeToast("Brak litery do usuniecia");
     }
-  }, [colors, setColors, content.wordOfDay]);
+  }, [colors, setColors, word]);
 
   useEffect(() => {
     const innerColors = { ...colors };
@@ -129,14 +130,14 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, onWin }) => {
   }, [gameState, setColors]);
   const handleGetWordLength = useCallback(() => {
     const wordLn = innerInput.length;
-    if (content.wordOfDay) {
-      if (wordLn > content.wordOfDay.length)
+    if (word) {
+      if (wordLn > word.length)
         makeToast("Twoje słowo jest dłuższe");
-      else if (wordLn == content.wordOfDay.length)
+      else if (wordLn == word.length)
         makeToast("Twoje słowo i słowo dnia są tej samej długości");
       else makeToast("Twoje słowo jest krótsze");
     }
-  }, [innerInput, content.wordOfDay]);
+  }, [innerInput, word]);
 
   useEffect(() => {
     if (!enter) {
@@ -151,10 +152,10 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, onWin }) => {
       .split("")
       .map((letter, id) => {
         let color: ColorType = "MISSED";
-        if (content.wordOfDay?.toUpperCase().includes(letter)) {
+        if (word?.toUpperCase().includes(letter)) {
           color = "YELLOW";
         }
-        if (content.wordOfDay?.[id]?.toUpperCase() === letter) {
+        if (word?.[id]?.toUpperCase() === letter) {
           color = "GREEN";
         }
         return {
@@ -183,7 +184,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, onWin }) => {
 
     if (
       greenTailsCount === lastRow.length &&
-      lastRow.length === content.wordOfDay?.length
+      lastRow.length === word?.length
     ) {
       setGameStatus(GameStatus.WON);
       onWin?.();
@@ -258,13 +259,13 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, onWin }) => {
       return [
         "Wygrałeś",
         "Gratulacje! Udało ci się odgadnąć słowo.",
-        content.wordOfDay,
+        word,
       ];
     else if (gameStatus == GameStatus.LOST)
       return [
         "Przegrałeś",
         "Niestety nie udało si się odgadnąć słowa.",
-        content.wordOfDay,
+        word,
       ];
     else return ["", ""];
   })();
