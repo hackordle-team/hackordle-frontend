@@ -41,7 +41,7 @@ const Multiplayer: React.FC = () => {
     <Wrapper>
       <div className="flex w-full space-x-3">
         <div className="w-3/5">
-          <Game
+          <Game isMulti={true}
             onUpdate={(n) => {
               const obj = {
                 status: "update",

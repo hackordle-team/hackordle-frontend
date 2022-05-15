@@ -11,16 +11,16 @@ import Question from "../components/Question";
 import { makeToast } from "../components/Toast";
 import { LETTER } from "../const/const";
 
-// const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
+const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
 const DEFAULT_COLUMNS = 8;
 const DEFAULT_ROWS = 6;
 
-// interface DailyGameState {
-//   gameState: GameState;
-//   date: string;
-//   rows: number;
-//   columns: number;
-// }
+interface DailyGameState {
+  gameState: GameState;
+  date: string;
+  rows: number;
+  columns: number;
+}
 
 enum GameStatus {
   IN_PROGRESS,
@@ -29,10 +29,11 @@ enum GameStatus {
 }
 
 interface GameProps {
+  isMulti: boolean,
   onUpdate?: (val: GameState) => void;
 }
 
-const Game: React.FC<GameProps> = ({ onUpdate }) => {
+const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
   const content = useContext(GameContendContext);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
@@ -189,34 +190,40 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
     }
   }, [gameState]);
 
-  // useEffect(() => {
-  //   const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
-  //   console.log(`retrieve gameState ${retrievedGameState}`);
-  //   if (retrievedGameState) {
-  //     const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
-  //     if (dailyGameState.date === new Date().toISOString().slice(0, 10)) {
-  //       setGameState(dailyGameState.gameState);
-  //       setRows(dailyGameState.rows);
-  //       setColumns(dailyGameState.columns);
-  //     }
-  //   }
-  // }, []);
+  useEffect(() => {
+    if(isMulti)
+      return;
+
+    const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
+    console.log(`retrieve gameState ${retrievedGameState}`);
+    if (retrievedGameState) {
+      const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
+      if (dailyGameState.date === new Date().toISOString().slice(0, 10)) {
+        setGameState(dailyGameState.gameState);
+        setRows(dailyGameState.rows);
+        setColumns(dailyGameState.columns);
+      }
+    }
+  }, []);
 
   useEffect(() => {
+    if(isMulti)
+      return;
+
     if (
       gameState.rowsNumber > 0 ||
       rows > DEFAULT_ROWS ||
       columns < DEFAULT_COLUMNS
     ) {
-      // const dailyGameState: DailyGameState = {
-      //   gameState: gameState,
-      //   date: new Date().toISOString().slice(0, 10),
-      //   rows: rows,
-      //   columns: columns,
-      // };
-      // const gameStateString = JSON.stringify(dailyGameState);
-      //console.log(`save gameState`);
-      //localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
+      const dailyGameState: DailyGameState = {
+        gameState: gameState,
+        date: new Date().toISOString().slice(0, 10),
+        rows: rows,
+        columns: columns,
+      };
+      const gameStateString = JSON.stringify(dailyGameState);
+      console.log(`save gameState`);
+      localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
     }
   }, [gameState, rows, columns]);
 
