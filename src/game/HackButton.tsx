@@ -6,6 +6,7 @@ interface HackbarProps {
   hackFunction: () => void;
   questionFunction: () => void;
   callbackMethod: (func: () => void) => void;
+  image: string;
 }
 
 const HackButton: React.FC<HackbarProps> = ({
@@ -13,11 +14,13 @@ const HackButton: React.FC<HackbarProps> = ({
   hackFunction,
   questionFunction,
   callbackMethod,
+  image,
 }) => {
   const execute = () => {
     callbackMethod(hackFunction);
     questionFunction();
   };
+  const path = "/assets/" + image
   return (
     <div>
       <button
@@ -25,7 +28,7 @@ const HackButton: React.FC<HackbarProps> = ({
         onClick={execute}
         key={hackName}
       >
-        {hackName}
+        <img src={path} alt={hackName}></img>
       </button>
       <ToastContainer />
     </div>

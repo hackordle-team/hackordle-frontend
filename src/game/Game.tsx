@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
 import { makeToast } from "../components/Toast";
 import ReactLoading from "react-loading";
+import { LETTER } from "../const/const";
 
 const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
 const DEFAULT_COLUMNS = 8;
@@ -29,12 +30,15 @@ enum GameStatus {
 }
 
 interface GameProps {
+  isMulti: boolean;
   onUpdate?: (val: GameState) => void;
-  isLoaded: boolean;
+  waiting?: boolean;
+  onWin?: () => void;
 }
 
-const Game: React.FC<GameProps> = ({ onUpdate, isLoaded }) => {
+const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
   const content = useContext(GameContendContext);
+  console.log(waiting);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
   const [columns, setColumns] = useState(DEFAULT_COLUMNS);
@@ -50,6 +54,10 @@ const Game: React.FC<GameProps> = ({ onUpdate, isLoaded }) => {
     console.log("init");
   };
   const [currentHack, setCurrentHack] = useState(() => defFunc);
+
+  const [colors, setColors] = useState(
+    Object.fromEntries(LETTER.map((key) => [key, "GRAY" as ColorType]))
+  );
 
   useEffect(() => onUpdate?.(gameState), [gameState]);
 
@@ -85,6 +93,40 @@ const Game: React.FC<GameProps> = ({ onUpdate, isLoaded }) => {
     makeToast("Dodano nową próbę");
   }, []);
 
+  const handleDeleteLetter = useCallback(() => {
+    const innerColors = { ...colors };
+    let count = 0;
+    let deleted = undefined;
+    LETTER.sort(() => 0.5 - Math.random()).map((el) => {
+      if (
+        count === 0 &&
+        !content.wordOfDay?.toUpperCase().includes(el) &&
+        innerColors[el] === "GRAY"
+      ) {
+        count += 1;
+        deleted = el;
+        innerColors[el] = "MISSED";
+      }
+    });
+    setColors(innerColors);
+    if (count === 1) {
+      makeToast(`Wykreślono litere ${deleted}`);
+    } else {
+      makeToast("Brak litery do usuniecia");
+    }
+  }, [colors, setColors, content.wordOfDay]);
+
+  useEffect(() => {
+    const innerColors = { ...colors };
+
+    gameState.rows.map((row) => {
+      row.elements.map((el) => {
+        innerColors[el.letter] = el.color;
+      });
+    });
+    setColors(innerColors);
+    //console.log(colors);
+  }, [gameState, setColors]);
   const handleGetWordLength = useCallback(() => {
     const wordLn = innerInput.length;
     if (content.wordOfDay) {
@@ -102,6 +144,7 @@ const Game: React.FC<GameProps> = ({ onUpdate, isLoaded }) => {
     }
     if (!content.dictionary?.includes(innerInput.toLowerCase())) {
       setEnter(false);
+      makeToast("Hasła nie ma w słowniku");
       return;
     }
     const lettersColored: GameElementType[] = innerInput
@@ -143,6 +186,7 @@ const Game: React.FC<GameProps> = ({ onUpdate, isLoaded }) => {
       lastRow.length === content.wordOfDay?.length
     ) {
       setGameStatus(GameStatus.WON);
+      onWin?.();
       return;
     }
 
@@ -152,20 +196,24 @@ const Game: React.FC<GameProps> = ({ onUpdate, isLoaded }) => {
     }
   }, [gameState]);
 
-  // useEffect(() => {
-  //   const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
-  //   console.log(`retrieve gameState ${retrievedGameState}`);
-  //   if (retrievedGameState) {
-  //     const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
-  //     if (dailyGameState.date === new Date().toISOString().slice(0, 10)) {
-  //       setGameState(dailyGameState.gameState);
-  //       setRows(dailyGameState.rows);
-  //       setColumns(dailyGameState.columns);
-  //     }
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (isMulti) return;
+
+    const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
+    console.log(`retrieve gameState ${retrievedGameState}`);
+    if (retrievedGameState) {
+      const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
+      if (dailyGameState.date === new Date().toISOString().slice(0, 10)) {
+        setGameState(dailyGameState.gameState);
+        setRows(dailyGameState.rows);
+        setColumns(dailyGameState.columns);
+      }
+    }
+  }, []);
 
   useEffect(() => {
+    if (isMulti) return;
+
     if (
       gameState.rowsNumber > 0 ||
       rows > DEFAULT_ROWS ||
@@ -177,9 +225,9 @@ const Game: React.FC<GameProps> = ({ onUpdate, isLoaded }) => {
         rows: rows,
         columns: columns,
       };
-      // const gameStateString = JSON.stringify(dailyGameState);
-      //console.log(`save gameState`);
-      //localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
+      const gameStateString = JSON.stringify(dailyGameState);
+      console.log(`save gameState`);
+      localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
     }
   }, [gameState, rows, columns]);
 
@@ -209,7 +257,7 @@ const Game: React.FC<GameProps> = ({ onUpdate, isLoaded }) => {
 
   return (
     <>
-      {!isLoaded && (
+      {!waiting && (
         <div className="justify-center items-center">
           <ReactLoading
             type={"bars"}
@@ -219,7 +267,7 @@ const Game: React.FC<GameProps> = ({ onUpdate, isLoaded }) => {
           />
         </div>
       )}
-      {isLoaded && (  
+      {waiting && (  
     <div className="w-full m-auto">
       <Notification
         title={notificationTitle}
@@ -245,21 +293,27 @@ const Game: React.FC<GameProps> = ({ onUpdate, isLoaded }) => {
         innerState={innerInput}
       />
       <Hackbar
-        hackNames={["HACK 1", "HACK 2", "HACK 3", "HACK 4"]}
+        hackNames={["REMOVE_COL", "ADD_ROW", "CHECK_LENGTH", "REMOVE_LETTER"]}
         hackFunctions={[
           handleDeleteColumn,
           handleAddRow,
           handleGetWordLength,
-          handleDeleteColumn,
+          handleDeleteLetter,
         ]}
         questionFunction={() => setShowQuestion(true)}
         callbackMethod={handleHackMethod}
+        images={[
+          "remove_col.png",
+          "add_row.png",
+          "check_length.png",
+          "remove_letter.png",
+        ]}
       />
       <Keyboard
         handleBackspace={handleBackspace}
         handleLetter={handleLetter}
         handleEnter={handleEnter}
-        gameState={gameState}
+        colors={colors}
       />
 
       {showQuestion && (
