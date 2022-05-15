@@ -16,7 +16,8 @@ const HackButton: React.FC<HackbarProps> = ({
   callbackMethod,
   image,
 }) => {
-  const execute = () => {
+  const execute = (e:  React.MouseEvent<HTMLElement>) => {
+    e.currentTarget.blur();
     callbackMethod(hackFunction);
     questionFunction();
   };

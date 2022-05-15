@@ -13,7 +13,10 @@ const Key: React.FC<KeyProps> = ({ value, handleClick, color, hover }) => {
   return (
     <button
       className={`${color} hover:${hover} m-0.5 text-white font-bold py-2 px-4 rounded-full`}
-      onClick={() => handleClick(value)}
+      onClick={(e) => {
+        e.currentTarget.blur();
+        handleClick(value);
+      }}
       value={value}
     >
       {value}
@@ -25,14 +28,14 @@ interface KeyboardProps {
   handleEnter: () => void;
   handleBackspace: () => void;
   handleLetter: (val: string) => void;
-  colors: {[k: string]: ColorType}
+  colors: { [k: string]: ColorType };
 }
 
 const Keyboard: React.FC<KeyboardProps> = ({
   handleBackspace,
   handleLetter,
   handleEnter,
-  colors
+  colors,
 }) => {
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
@@ -40,7 +43,10 @@ const Keyboard: React.FC<KeyboardProps> = ({
         handleEnter();
       } else if (event.key === "Backspace") {
         handleBackspace();
-      } else if (event.key.length === 1 && (event.key.match(/[a-z]/i) || event.key.match(/[A-Z]/i))){
+      } else if (
+        event.key.length === 1 &&
+        (event.key.match(/[a-z]/i) || event.key.match(/[A-Z]/i))
+      ) {
         handleLetter(event.key.toUpperCase());
       }
     };
@@ -54,7 +60,10 @@ const Keyboard: React.FC<KeyboardProps> = ({
       handleBackspace();
     } else if (val === "ENTER") {
       handleEnter();
-    } else if (val.length === 1 && (val.match(/[a-z]/i) || val.match(/[A-Z]/i))){
+    } else if (
+      val.length === 1 &&
+      (val.match(/[a-z]/i) || val.match(/[A-Z]/i))
+    ) {
       handleLetter(val);
     }
   };
