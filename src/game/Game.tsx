@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import Board from "./Board";
 import Keyboard from "./Keyboard";
 import Hackbar from "./Hackbar";
@@ -10,6 +10,17 @@ import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
 import {makeToast} from "../components/Toast";
 
+const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
+const DEFAULT_COLUMNS = 8;
+const DEFAULT_ROWS = 6;
+
+interface DailyGameState {
+  gameState: GameState,
+  date: string,
+  rows: number,
+  columns: number
+}
+
 enum GameStatus {
   IN_PROGRESS,
   WON,
@@ -20,9 +31,8 @@ const Game: React.FC = () => {
   const content = useContext(GameContendContext);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
-  const [columns, setColumns] = useState(8);
-  const [rows, setRows] = useState(6);
-  const [maxRows, setMaxRows] = useState(8); //maksymalna liczba prób
+  const [columns, setColumns] = useState(DEFAULT_COLUMNS);
+  const [rows, setRows] = useState(DEFAULT_ROWS);
   const [gameState, setGameState] = useState<GameState>({
     rowsNumber: 0,
     rows: [],
@@ -120,20 +130,45 @@ const Game: React.FC = () => {
       return;
     }
 
-    if (maxRows === gameState.rowsNumber) {
+    if (rows === gameState.rowsNumber) {
       setGameStatus(GameStatus.LOST);
       return;
     }
   }, [gameState]);
 
+  useEffect(() => {
+    const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
+    console.log(`retrieve gameState ${retrievedGameState}`);
+    if(retrievedGameState){
+      const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
+      if(dailyGameState.date === new Date().toISOString().slice(0, 10)){
+        setGameState(dailyGameState.gameState);
+        setRows(dailyGameState.rows);
+        setColumns(dailyGameState.columns);
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if(gameState.rowsNumber > 0 || rows > DEFAULT_ROWS || columns < DEFAULT_COLUMNS){
+      const dailyGameState: DailyGameState = {
+        gameState: gameState,
+        date: new Date().toISOString().slice(0, 10),
+        rows: rows,
+        columns: columns
+      };
+      const gameStateString = JSON.stringify(dailyGameState);
+      console.log(`save gameState`);
+      localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
+    }
+  }, [gameState, rows, columns])
+
   const handleEnter = () => {
     setEnter(true);
-    //console.log("Enter pressed");
   };
 
   const handleGameFinish = () => {
-    //TODO: go to main menu
-    navigate("/");
+    navigate('/')
   };
 
   const [notificationTitle, notificationMsg] = (() => {
