@@ -8,6 +8,13 @@ import Notification from "../components/Notification";
 import {useNavigate} from "react-router-dom";
 import Question from "../components/Question";
 
+const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
+
+interface DailyGameState {
+  gameState: GameState,
+  date: string
+}
+
 enum GameStatus {
   IN_PROGRESS,
   WON,
@@ -93,13 +100,34 @@ const Game: React.FC = () => {
     }
   }, [gameState])
 
+  useEffect(() => {
+    const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
+    console.log(`retrieve gameState ${retrievedGameState}`);
+    if(retrievedGameState){
+      const dailyGameState: DailyGameState = JSON.parse(retrievedGameState);
+      if(dailyGameState.date === new Date().toISOString().slice(0, 10))
+        setGameState(dailyGameState.gameState);
+    }
+  }, [])
+
+  useEffect(() => {
+    if(gameState.rowsNumber > 0){
+      const dailyGameState: DailyGameState = {
+        gameState: gameState,
+        date: new Date().toISOString().slice(0, 10)
+      };
+      const gameStateString = JSON.stringify(dailyGameState);
+      console.log(`save gameState`);
+      localStorage.setItem(LOCALSTORAGE_GAMESTATE_KEY, gameStateString);
+    }
+  }, [gameState])
+
   const handleEnter = () => {
     setEnter(true);
     //console.log("Enter pressed");
   };
 
   const handleGameFinish = () => {
-    //TODO: go to main menu
     navigate('/')
   };
 
