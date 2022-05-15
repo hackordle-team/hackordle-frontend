@@ -82,7 +82,7 @@ const Keyboard: React.FC<KeyboardProps> = ({
       if (col === "GREEN") return "bg-green-500";
       if (col === "YELLOW") return "bg-yellow-500";
       if (col === "GRAY") return "bg-gray-500";
-      if (col === "MISSED") return "bg-black";
+      if (col == "MISSED") return "bg-gray-700";
     },
     [colors]
   );
