@@ -9,11 +9,12 @@ import Notification from "../components/Notification";
 import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
 import { makeToast } from "../components/Toast";
+import ReactLoading from "react-loading";
 import { LETTER } from "../const/const";
 
 const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
-const DEFAULT_COLUMNS = 8;
-const DEFAULT_ROWS = 6;
+const DEFAULT_COLUMNS = 10;
+const DEFAULT_ROWS = 8;
 
 interface DailyGameState {
   gameState: GameState;
@@ -29,12 +30,15 @@ enum GameStatus {
 }
 
 interface GameProps {
-  isMulti: boolean,
+  isMulti: boolean;
   onUpdate?: (val: GameState) => void;
+  waiting?: boolean;
+  onWin?: () => void;
 }
 
-const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
+const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
   const content = useContext(GameContendContext);
+  console.log(waiting);
   const navigate = useNavigate();
   const [innerInput, setInnerInput] = useState<string>("");
   const [columns, setColumns] = useState(DEFAULT_COLUMNS);
@@ -121,7 +125,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
       });
     });
     setColors(innerColors);
-    console.log(colors);
+    //console.log(colors);
   }, [gameState, setColors]);
   const handleGetWordLength = useCallback(() => {
     const wordLn = innerInput.length;
@@ -140,6 +144,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
     }
     if (!content.dictionary?.includes(innerInput.toLowerCase())) {
       setEnter(false);
+      makeToast("Hasła nie ma w słowniku");
       return;
     }
     const lettersColored: GameElementType[] = innerInput
@@ -181,6 +186,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
       lastRow.length === content.wordOfDay?.length
     ) {
       setGameStatus(GameStatus.WON);
+      onWin?.();
       return;
     }
 
@@ -191,8 +197,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
   }, [gameState]);
 
   useEffect(() => {
-    if(isMulti)
-      return;
+    if (isMulti) return;
 
     const retrievedGameState = localStorage.getItem(LOCALSTORAGE_GAMESTATE_KEY);
     console.log(`retrieve gameState ${retrievedGameState}`);
@@ -207,8 +212,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
   }, []);
 
   useEffect(() => {
-    if(isMulti)
-      return;
+    if (isMulti) return;
 
     if (
       gameState.rowsNumber > 0 ||
@@ -252,61 +256,85 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
   })();
 
   return (
-    <div className="w-full m-auto">
-      <Notification
-        title={notificationTitle}
-        msg={notificationMsg}
-        wordOfDay={notificationWordOfDay}
-        open={gameStatus !== GameStatus.IN_PROGRESS}
-        handleClose={handleGameFinish}
-      >
-        <button
-          className={
-            "rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"
-          }
-          style={{ margin: "1vh" }}
-          onClick={handleGameFinish}
-        >
-          MENU
-        </button>
-      </Notification>
-      <Board
-        cols={columns}
-        rows={rows}
-        gameState={gameState}
-        innerState={innerInput}
-      />
-      <Hackbar
-        hackNames={["REMOVE_COL", "ADD_ROW", "CHECK_LENGTH", "REMOVE_LETTER"]}
-        hackFunctions={[
-          handleDeleteColumn,
-          handleAddRow,
-          handleGetWordLength,
-          handleDeleteLetter,
-        ]}
-        questionFunction={() => setShowQuestion(true)}
-        callbackMethod={handleHackMethod}
-        images={["remove_col.png", "add_row.png", "check_length.png", "remove_letter.png"]}
-      />
-      <Keyboard
-        handleBackspace={handleBackspace}
-        handleLetter={handleLetter}
-        handleEnter={handleEnter}
-        colors={colors}
-      />
-
-      {showQuestion && (
-        <Question
-          question={content.questions?.[0]}
-          hackName={"hack"}
-          onResult={(correctAnswer) => {
-            setShowQuestion(false);
-            if (correctAnswer) currentHack();
-            else setGameStatus(GameStatus.LOST);
-          }}
-        />
+    <>
+      {waiting && (
+        <div className="justify-center items-center w-full flex h-full ">
+          <ReactLoading
+            type={"bars"}
+            color={"#3BACB6"}
+            height={100}
+            width={100}
+          />
+        </div>
       )}
-    </div>
+      {!waiting && (
+        <div className="w-full m-auto">
+          <Notification
+            title={notificationTitle}
+            msg={notificationMsg}
+            wordOfDay={notificationWordOfDay}
+            open={gameStatus !== GameStatus.IN_PROGRESS}
+            handleClose={handleGameFinish}
+          >
+            <button
+              className={
+                "rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"
+              }
+              style={{ margin: "1vh" }}
+              onClick={handleGameFinish}
+            >
+              MENU
+            </button>
+          </Notification>
+          <Board
+            cols={columns}
+            rows={rows}
+            gameState={gameState}
+            innerState={innerInput}
+          />
+          <Hackbar
+            hackNames={[
+              "REMOVE_COL",
+              "ADD_ROW",
+              "CHECK_LENGTH",
+              "REMOVE_LETTER",
+            ]}
+            hackFunctions={[
+              handleDeleteColumn,
+              handleAddRow,
+              handleGetWordLength,
+              handleDeleteLetter,
+            ]}
+            questionFunction={() => setShowQuestion(true)}
+            callbackMethod={handleHackMethod}
+            images={[
+              "remove_col.png",
+              "add_row.png",
+              "check_length.png",
+              "remove_letter.png",
+            ]}
+          />
+          <Keyboard
+            handleBackspace={handleBackspace}
+            handleLetter={handleLetter}
+            handleEnter={handleEnter}
+            colors={colors}
+          />
+
+          {showQuestion && (
+            <Question
+              question={content.questions?.[0]}
+              hackName={"hack"}
+              onResult={(correctAnswer) => {
+                setShowQuestion(false);
+                if (correctAnswer) currentHack();
+                else setGameStatus(GameStatus.LOST);
+              }}
+            />
+          )}
+        </div>
+      )}
+    </>
   );
 };
 

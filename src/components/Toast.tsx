@@ -1,4 +1,4 @@
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 export const makeToast = (message: string) => {
   toast.info(message, {
@@ -9,5 +9,6 @@ export const makeToast = (message: string) => {
     pauseOnHover: false,
     draggable: true,
     progress: undefined,
+    type: "info",
   });
-}
+};
