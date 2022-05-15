@@ -277,7 +277,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
         innerState={innerInput}
       />
       <Hackbar
-        hackNames={["HACK 1", "HACK 2", "HACK 3", "HACK 4"]}
+        hackNames={["REMOVE_COL", "ADD_ROW", "CHECK_LENGTH", "REMOVE_LETTER"]}
         hackFunctions={[
           handleDeleteColumn,
           handleAddRow,
@@ -286,6 +286,7 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate }) => {
         ]}
         questionFunction={() => setShowQuestion(true)}
         callbackMethod={handleHackMethod}
+        images={["remove_col.png", "add_row.png", "check_length.png", "remove_letter.png"]}
       />
       <Keyboard
         handleBackspace={handleBackspace}
