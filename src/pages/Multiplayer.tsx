@@ -1,20 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import Wrapper from "../components/Wrapper";
 import Game from "../game/Game";
-import { GameState } from "../const/types";
 import BlurredBoard from "../game/BlurredBoard";
 import { MockGameState } from "../const/const";
 
-const MULTI_SERVER_URL = "";
+// const MULTI_SERVER_URL = "";
 
 const Multiplayer: React.FC = () => {
   const webSocket = useRef<WebSocket>();
   const [messages, setMessages] = useState<string[]>([]);
 
-  const [opponentState, setOpponentState] = useState<GameState>({
-    rowsNumber: 0,
-    rows: [],
-  });
+  // const [opponentState, setOpponentState] = useState<GameState>({
+  //   rowsNumber: 0,
+  //   rows: [],
+  // });
 
   useEffect(() => {
     webSocket.current = new WebSocket("ws://url");
