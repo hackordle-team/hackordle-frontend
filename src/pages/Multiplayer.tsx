@@ -8,7 +8,6 @@ import { GameState } from "../const/types";
 
 const Multiplayer: React.FC = () => {
   const webSocket = useRef<WebSocket>();
-  const [messages, setMessages] = useState<string[]>([]);
 
   const [opponentState, setOpponentState] = useState<GameState>({
     rowsNumber: 0,
@@ -21,7 +20,7 @@ const Multiplayer: React.FC = () => {
     webSocket.current = new WebSocket("ws://217.182.75.199:5000/multiplayer");
 
     webSocket.current.onmessage = (message) => {
-      // console.log("Message: ", message.data);
+      console.log("Message: ", message.data);
       const d = JSON.parse(message.data);
 
       // console.log(d);

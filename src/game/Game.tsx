@@ -9,6 +9,7 @@ import Notification from "../components/Notification";
 import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
 import { makeToast } from "../components/Toast";
+import { LETTER } from "../const/const";
 
 const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
 const DEFAULT_COLUMNS = 8;
@@ -49,6 +50,10 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
   };
   const [currentHack, setCurrentHack] = useState(() => defFunc);
 
+  const [colors, setColors] = useState(
+    Object.fromEntries(LETTER.map((key) => [key, "GRAY" as ColorType]))
+  );
+
   useEffect(() => onUpdate?.(gameState), [gameState]);
 
   const handleHackMethod = useCallback((func: () => void) => {
@@ -81,6 +86,40 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
     makeToast("Dodano nową próbę");
   }, []);
 
+  const handleDeleteLetter = useCallback(() => {
+    const innerColors = { ...colors };
+    let count = 0;
+    let deleted = undefined;
+    LETTER.sort(() => 0.5 - Math.random()).map((el) => {
+      if (
+        count === 0 &&
+        !content.wordOfDay?.toUpperCase().includes(el) &&
+        innerColors[el] === "GRAY"
+      ) {
+        count += 1;
+        deleted = el;
+        innerColors[el] = "MISSED";
+      }
+    });
+    setColors(innerColors);
+    if (count === 1) {
+      makeToast(`Wykreślono litere ${deleted}`);
+    } else {
+      makeToast("Brak litery do usuniecia");
+    }
+  }, [colors, setColors, content.wordOfDay]);
+
+  useEffect(() => {
+    const innerColors = { ...colors };
+
+    gameState.rows.map((row) => {
+      row.elements.map((el) => {
+        innerColors[el.letter] = el.color;
+      });
+    });
+    setColors(innerColors);
+    console.log(colors);
+  }, [gameState, setColors]);
   const handleGetWordLength = useCallback(() => {
     const wordLn = innerInput.length;
     if (content.wordOfDay) {
@@ -227,7 +266,7 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
           handleDeleteColumn,
           handleAddRow,
           handleGetWordLength,
-          handleDeleteColumn,
+          handleDeleteLetter,
         ]}
         questionFunction={() => setShowQuestion(true)}
         callbackMethod={handleHackMethod}
@@ -236,7 +275,7 @@ const Game: React.FC<GameProps> = ({ onUpdate }) => {
         handleBackspace={handleBackspace}
         handleLetter={handleLetter}
         handleEnter={handleEnter}
-        gameState={gameState}
+        colors={colors}
       />
 
       {showQuestion && (
