@@ -75,6 +75,18 @@ const Game: React.FC = () => {
     makeToast("Dodano nową próbę");
   }, []);
 
+  const handleGetWordLength = useCallback(() => {
+    const wordLn = innerInput.length;
+    if (content.wordOfDay) {
+      if (wordLn > content.wordOfDay.length)
+        makeToast("Twoje słowo jest dłuższe");
+      else if (wordLn == content.wordOfDay.length)
+        makeToast("Twoje słowo i słowo dnia są tej samej długości");
+      else
+        makeToast("Twoje słowo jest krótsze");
+    }
+  }, [innerInput, content.wordOfDay]);
+
   useEffect(() => {
     if (!enter) {
       return;
@@ -207,7 +219,7 @@ const Game: React.FC = () => {
         hackFunctions={[
           handleDeleteColumn,
           handleAddRow,
-          handleDeleteColumn,
+          handleGetWordLength,
           handleDeleteColumn,
         ]}
         questionFunction={() => setShowQuestion(true)}
