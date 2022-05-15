@@ -207,6 +207,7 @@ const Game: React.FC = () => {
           handleDeleteColumn,
           handleAddRow,
           handleDeleteColumn,
+
           handleDeleteColumn,
         ]}
         questionFunction={() => setShowQuestion(true)}

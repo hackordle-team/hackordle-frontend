@@ -16,7 +16,7 @@ const Multiplayer: React.FC = () => {
   // });
 
   useEffect(() => {
-    webSocket.current = new WebSocket("ws://url");
+    webSocket.current = new WebSocket("wss://socketsbay.com/wss/v2/2/demo/");
 
     webSocket.current.onmessage = (message) => {
       setMessages((prev) => [...prev, message.data]);
