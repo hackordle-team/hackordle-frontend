@@ -182,11 +182,11 @@ const Game: React.FC = () => {
     navigate("/");
   };
 
-  const [notificationTitle, notificationMsg] = (() => {
+  const [notificationTitle, notificationMsg, notificationWordOfDay] = (() => {
     if (gameStatus == GameStatus.WON)
-      return ["Wygrałeś", "Gratulacje! Udało ci się odgadnąć słowo."];
+      return ["Wygrałeś", "Gratulacje! Udało ci się odgadnąć słowo.", content.wordOfDay];
     else if (gameStatus == GameStatus.LOST)
-      return ["Przgrałeś", "Niestety nie udało si się odgadnąć słowa."];
+      return ["Przegrałeś", "Niestety nie udało si się odgadnąć słowa.", content.wordOfDay];
     else return ["", ""];
   })();
 
@@ -195,6 +195,7 @@ const Game: React.FC = () => {
       <Notification
         title={notificationTitle}
         msg={notificationMsg}
+        wordOfDay={notificationWordOfDay}
         open={gameStatus !== GameStatus.IN_PROGRESS}
         handleClose={handleGameFinish}
       >
