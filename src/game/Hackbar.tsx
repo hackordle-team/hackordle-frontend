@@ -6,6 +6,7 @@ interface HackbarProps {
   hackFunctions: Array<() => void>;
   questionFunction: () => void;
   callbackMethod: (func: () => void) => void;
+  images: Array<string>;
 }
 
 const Hackbar: React.FC<HackbarProps> = ({
@@ -13,6 +14,7 @@ const Hackbar: React.FC<HackbarProps> = ({
   hackFunctions,
   questionFunction,
   callbackMethod,
+  images,
 }) => {
   return (
     <div className="flex justify-center px-4 py-4 w-full">
@@ -24,6 +26,7 @@ const Hackbar: React.FC<HackbarProps> = ({
             hackFunction={hackFunctions[index]}
             questionFunction={questionFunction}
             callbackMethod={callbackMethod}
+            image={images[index]}
           />
         );
       })}

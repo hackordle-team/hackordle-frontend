@@ -224,6 +224,7 @@ const Game: React.FC = () => {
         ]}
         questionFunction={() => setShowQuestion(true)}
         callbackMethod={handleHackMethod}
+        images={["remove_col.svg", "add_row.svg", "check_length.svg", "remove_letter.svg"]}
       />
       <Keyboard
         handleBackspace={handleBackspace}
