@@ -29,7 +29,7 @@ const Multiplayer: React.FC = () => {
 
       console.log(d);
 
-      if (d?.status == "start") {
+      if (d?.type == "start") {
         setWaiting(false);
       }
       if (d?.status == "win") {

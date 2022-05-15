@@ -257,8 +257,8 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
 
   return (
     <>
-      {!waiting && (
-        <div className="justify-center items-center">
+      {waiting && (
+        <div className="justify-center items-center w-full flex h-full ">
           <ReactLoading
             type={"bars"}
             color={"#3BACB6"}
@@ -267,68 +267,73 @@ const Game: React.FC<GameProps> = ({ isMulti, onUpdate, waiting, onWin }) => {
           />
         </div>
       )}
-      {waiting && (  
-    <div className="w-full m-auto">
-      <Notification
-        title={notificationTitle}
-        msg={notificationMsg}
-        wordOfDay={notificationWordOfDay}
-        open={gameStatus !== GameStatus.IN_PROGRESS}
-        handleClose={handleGameFinish}
-      >
-        <button
-          className={
-            "rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"
-          }
-          style={{ margin: "1vh" }}
-          onClick={handleGameFinish}
-        >
-          MENU
-        </button>
-      </Notification>
-      <Board
-        cols={columns}
-        rows={rows}
-        gameState={gameState}
-        innerState={innerInput}
-      />
-      <Hackbar
-        hackNames={["REMOVE_COL", "ADD_ROW", "CHECK_LENGTH", "REMOVE_LETTER"]}
-        hackFunctions={[
-          handleDeleteColumn,
-          handleAddRow,
-          handleGetWordLength,
-          handleDeleteLetter,
-        ]}
-        questionFunction={() => setShowQuestion(true)}
-        callbackMethod={handleHackMethod}
-        images={[
-          "remove_col.png",
-          "add_row.png",
-          "check_length.png",
-          "remove_letter.png",
-        ]}
-      />
-      <Keyboard
-        handleBackspace={handleBackspace}
-        handleLetter={handleLetter}
-        handleEnter={handleEnter}
-        colors={colors}
-      />
+      {!waiting && (
+        <div className="w-full m-auto">
+          <Notification
+            title={notificationTitle}
+            msg={notificationMsg}
+            wordOfDay={notificationWordOfDay}
+            open={gameStatus !== GameStatus.IN_PROGRESS}
+            handleClose={handleGameFinish}
+          >
+            <button
+              className={
+                "rounded-3xl text-white px-4 py-2 border-box mx-6 w-full bg-neutral-400 hover:bg-neutral-300"
+              }
+              style={{ margin: "1vh" }}
+              onClick={handleGameFinish}
+            >
+              MENU
+            </button>
+          </Notification>
+          <Board
+            cols={columns}
+            rows={rows}
+            gameState={gameState}
+            innerState={innerInput}
+          />
+          <Hackbar
+            hackNames={[
+              "REMOVE_COL",
+              "ADD_ROW",
+              "CHECK_LENGTH",
+              "REMOVE_LETTER",
+            ]}
+            hackFunctions={[
+              handleDeleteColumn,
+              handleAddRow,
+              handleGetWordLength,
+              handleDeleteLetter,
+            ]}
+            questionFunction={() => setShowQuestion(true)}
+            callbackMethod={handleHackMethod}
+            images={[
+              "remove_col.png",
+              "add_row.png",
+              "check_length.png",
+              "remove_letter.png",
+            ]}
+          />
+          <Keyboard
+            handleBackspace={handleBackspace}
+            handleLetter={handleLetter}
+            handleEnter={handleEnter}
+            colors={colors}
+          />
 
-      {showQuestion && (
-        <Question
-          question={content.questions?.[0]}
-          hackName={"hack"}
-          onResult={(correctAnswer) => {
-            setShowQuestion(false);
-            if (correctAnswer) currentHack();
-            else setGameStatus(GameStatus.LOST);
-          }}
-        />
+          {showQuestion && (
+            <Question
+              question={content.questions?.[0]}
+              hackName={"hack"}
+              onResult={(correctAnswer) => {
+                setShowQuestion(false);
+                if (correctAnswer) currentHack();
+                else setGameStatus(GameStatus.LOST);
+              }}
+            />
+          )}
+        </div>
       )}
-    </div>
-    )}
     </>
   );
 };
