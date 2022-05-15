@@ -13,7 +13,7 @@ import { LETTER } from "../const/const";
 
 const LOCALSTORAGE_GAMESTATE_KEY = "hackordle_game_state";
 const DEFAULT_COLUMNS = 8;
-const DEFAULT_ROWS = 6;
+const DEFAULT_ROWS = 8;
 
 interface DailyGameState {
   gameState: GameState;
