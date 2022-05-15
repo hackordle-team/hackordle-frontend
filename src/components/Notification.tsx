@@ -4,6 +4,7 @@ import {Box, Modal, Typography} from "@mui/material";
 interface NotificationProps {
     title: string,
     msg: string,
+    wordOfDay?: string;
     open: boolean,
     handleClose: () => void,
     children?: React.ReactNode;
@@ -21,7 +22,7 @@ const boxStyle = {
     p: 4,
 };
 
-const Notification: React.FC<NotificationProps> = ({title, msg, open, handleClose, children}) => {
+const Notification: React.FC<NotificationProps> = ({title, msg, open, handleClose, children, wordOfDay}) => {
     return (
         <Modal
             style={{color: '#A1A1AA'}}
@@ -36,6 +37,9 @@ const Notification: React.FC<NotificationProps> = ({title, msg, open, handleClos
                 </Typography>
                 <Typography id="modal-notification-description" sx={{ mt: 2 }}>
                     <p className={"font-bold"}>{msg}</p>
+                </Typography>
+                <Typography id="modal-notification-description" sx={{ mt: 2 }}>
+                    <p className={"font-bold"}>Słowo dnia: {wordOfDay}</p>
                 </Typography>
                 {children}
             </Box>
