@@ -1,5 +1,4 @@
 import React from "react";
-import Wrapper from "../components/Wrapper";
 
 const Help: React.FC = () => {
   return <div className="font-mono font-bold px-20 py-10 w-full h-full text-white text-center bg-gray-900 margin-auto">
