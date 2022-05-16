@@ -129,8 +129,8 @@ const Game: React.FC<GameProps> = ({word, isMulti, onUpdate, onWin }) => {
     //console.log(colors);
   }, [gameState, setColors]);
   const handleGetWordLength = useCallback(() => {
-    const wordLn = innerInput.length;
-    if (word) {
+    if (word && gameState.rowsNumber > 0) {
+      const wordLn = gameState.rows[gameState.rowsNumber-1].length;
       if (wordLn > word.length)
         makeToast("Twoje słowo jest dłuższe");
       else if (wordLn == word.length)
